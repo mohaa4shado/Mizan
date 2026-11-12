@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f7ff" />
+    <link rel="icon" href="../pic/Mizan Logo 02.png" />
+    <title>MIZAN | إدارة العملاء</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../style/clients.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <a class="brand" href="../index.html" aria-label="العودة للرئيسية">
+        <img src="../pic/Mizan Logo 02.png" alt="" />
+      </a>
+      <div class="topbar-actions">
+        <a
+          class="icon-button home-link"
+          href="../index.html"
+          title="الرئيسية"
+          aria-label="الرئيسية"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">home</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="page-heading">
+        <div>
+          <span class="eyebrow">لوحة التحكم / العملاء</span>
+          <h1>إدارة العملاء</h1>
+          <p>نظّم بيانات عملائك وتابع حالتهم من مكان واحد.</p>
+        </div>
+        <button id="addClientButton" class="primary-button" type="button">
+          <span class="material-symbols-outlined" aria-hidden="true"
+            >person_add</span
+          >
+          إضافة عميل
+        </button>
+      </section>
+
+      <section class="stats-grid" aria-label="ملخص العملاء">
+        <article class="stat-card">
+          <span
+            class="stat-icon blue material-symbols-outlined"
+            aria-hidden="true"
+            >groups</span
+          >
+          <div>
+            <p>إجمالي العملاء</p>
+            <strong id="totalUsers">0</strong>
+          </div>
+          <span class="stat-caption">عميل مسجّل</span>
+        </article>
+        <article class="stat-card">
+          <span
+            class="stat-icon green material-symbols-outlined"
+            aria-hidden="true"
+            >verified_user</span
+          >
+          <div>
+            <p>عملاء نشطون</p>
+            <strong id="activeUsers">0</strong>
+          </div>
+          <span class="stat-caption">حساب نشط</span>
+        </article>
+        <article class="stat-card">
+          <span
+            class="stat-icon amber material-symbols-outlined"
+            aria-hidden="true"
+            >person_off</span
+          >
+          <div>
+            <p>غير نشطين</p>
+            <strong id="inactiveUsers">0</strong>
+          </div>
+          <span class="stat-caption">حساب غير نشط</span>
+        </article>
+      </section>
+
+      <section class="directory-panel">
+        <div class="directory-heading">
+          <div>
+            <h2>قائمة العملاء</h2>
+            <p>ابحث في البيانات أو استخدم خيارات التصفية.</p>
+          </div>
+          <span class="live-indicator"><span></span>تحديث مباشر</span>
+        </div>
+
+        <div class="toolbar">
+          <label class="search-box" for="searchInput">
+            <span class="material-symbols-outlined" aria-hidden="true"
+              >search</span
+            >
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="ابحث بالاسم أو الهاتف أو الرقم القومي"
+              autocomplete="off"
+            />
+            <kbd>⌕</kbd>
+          </label>
+          <label class="select-control">
+            <span class="material-symbols-outlined" aria-hidden="true"
+              >filter_list</span
+            >
+            <select id="statusFilter" aria-label="تصفية حسب الحالة">
+              <option value="all">كل الحالات</option>
+              <option value="active">نشط</option>
+              <option value="inactive">غير نشط</option>
+            </select>
+          </label>
+          <label class="select-control">
+            <span class="material-symbols-outlined" aria-hidden="true"
+              >sort</span
+            >
+            <select id="sortFilter" aria-label="ترتيب العملاء">
+              <option value="newest">الأحدث إضافة</option>
+              <option value="name-asc">الاسم: أ إلى ي</option>
+              <option value="name-desc">الاسم: ي إلى أ</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">العميل</th>
+                <th scope="col">الوظيفة</th>
+                <th scope="col">رقم الهاتف</th>
+                <th scope="col">الرقم القومي</th>
+                <th scope="col">الجنسية</th>
+                <th scope="col">الحالة</th>
+                <th scope="col">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="membersTable"></tbody>
+          </table>
+        </div>
+
+        <div id="membersCards" class="client-cards"></div>
+
+        <div class="directory-footer">
+          <p id="resultsSummary" aria-live="polite">عرض 0 من 0 عميل</p>
+          <div class="pagination">
+            <label class="page-size-control">
+              <span>لكل صفحة</span>
+              <select id="pageSize" aria-label="عدد العملاء في الصفحة">
+                <option value="6">6</option>
+                <option value="12">12</option>
+                <option value="24">24</option>
+              </select>
+            </label>
+            <button
+              id="previousPage"
+              class="page-button"
+              type="button"
+              aria-label="الصفحة السابقة"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true"
+                >chevron_right</span
+              >
+            </button>
+            <span id="pageIndicator" class="page-indicator">1 / 1</span>
+            <button
+              id="nextPage"
+              class="page-button"
+              type="button"
+              aria-label="الصفحة التالية"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true"
+                >chevron_left</span
+              >
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <a class="back-link" href="../index.html">
+        <span class="material-symbols-outlined" aria-hidden="true"
+          >arrow_forward</span
+        >
+        العودة إلى الصفحة الرئيسية
+      </a>
+    </main>
+
+    <div id="clientOverlay" class="client-overlay" aria-hidden="true"></div>
+    <section
+      id="clientModal"
+      class="client-modal mt-10"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="memberModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-heading">
+        <div>
+          <span class="eyebrow">بيانات العميل</span>
+          <h2 id="memberModalTitle">إضافة عميل جديد</h2>
+          <p>أدخل البيانات الأساسية لإضافته إلى قائمة العملاء.</p>
+        </div>
+        <button
+          id="closeClientModal"
+          class="icon-button close-button"
+          type="button"
+          aria-label="إغلاق"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true"
+            >close</span
+          >
+        </button>
+      </div>
+
+      <form id="memberForm" class="mt-10" >
+        <div class="form-grid">
+          <label class="form-field">
+            <span>الاسم الكامل <b>*</b></span>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              maxlength="100"
+              placeholder="مثال: أحمد محمد"
+              required
+            />
+          </label>
+          <label class="form-field">
+            <span>الوظيفة <b>*</b></span>
+            <input
+              id="occupation"
+              name="occupation"
+              type="text"
+              maxlength="80"
+              placeholder="المهنة أو الوظيفة"
+              required
+            />
+          </label>
+          <label class="form-field">
+            <span>رقم الهاتف <b>*</b></span>
+            <input
+              id="mobile"
+              name="mobile"
+              type="tel"
+              inputmode="tel"
+              maxlength="20"
+              placeholder="مثال: 01012345678"
+              required
+            />
+          </label>
+          <label class="form-field">
+            <span>الرقم القومي <b>*</b></span>
+            <input
+              id="nationalId"
+              name="nationalId"
+              type="text"
+              inputmode="numeric"
+              maxlength="25"
+              placeholder="رقم الهوية"
+              required
+            />
+          </label>
+          <label class="form-field">
+            <span>الجنسية <b>*</b></span>
+            <input
+              id="nationality"
+              name="nationality"
+              type="text"
+              maxlength="60"
+              placeholder="الجنسية"
+              required
+            />
+          </label>
+          <label class="form-field">
+            <span>العنوان</span>
+            <input
+              id="address"
+              name="address"
+              type="text"
+              maxlength="160"
+              placeholder="المدينة أو العنوان"
+            />
+          </label>
+        </div>
+
+        <label class="form-field image-field">
+          <span>صورة العميل <small>اختياري · حتى 2 ميجابايت</small></span>
+          <div class="image-picker">
+            <img
+              id="imagePreview"
+              src="../pic/images.png"
+              alt="معاينة صورة العميل"
+            />
+            <input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+            />
+          </div>
+        </label>
+
+        <label id="activeField" class="active-field hidden">
+          <input id="clientActive" type="checkbox" checked />
+          <span>العميل نشط</span>
+        </label>
+
+        <div class="modal-actions">
+          <button id="memberSubmitBtn" class="primary-button" type="submit">
+            حفظ العميل
+          </button>
+          <button id="cancelClientModal" class="secondary-button" type="button">
+            إلغاء
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <div
+      id="overlay"
+      class="notification-overlay hidden opacity-0"
+      aria-hidden="true"
+    ></div>
+    <section
+      id="modal"
+      class="notification-modal hidden opacity-0 scale-95"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="notification-card">
+        <div class="notification-heading">
+          <h2 id="modalTitle">الإشعارات</h2>
+          <button
+            id="closeModalBtn"
+            class="icon-button"
+            type="button"
+            aria-label="إغلاق"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true"
+              >close</span
+            >
+          </button>
+        </div>
+        <div id="modalContent" class="notification-content"></div>
+      </div>
+    </section>
+
+    <script src="../script/clients.js"></script>
+    <script src="../script/notifications.js"></script>
+    <script src="../script/unified-navbar.js"></script>
+
+    <script>
+      (() => {
+        const button = document
+          .querySelector('[data-icon="notifications"]')
+          ?.closest("button");
+        const overlay = document.getElementById("overlay");
+        const closeButton = document.getElementById("closeModalBtn");
+        if (!button || !overlay || !closeButton) return;
+
+        button.addEventListener("click", () => window.openNotifications?.());
+        closeButton.addEventListener("click", () => window.closeModal?.());
+        overlay.addEventListener("click", (event) => {
+          if (event.target === overlay) window.closeModal?.();
+        });
+      })();
+    </script>
+  </body>
+</html>

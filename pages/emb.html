@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../pic/Mizan Logo 02.png" />
+    <title>MIZAN | إدارة الموظفين</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Cairo Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../style/emb.css" />
+    <script src="../script/unified-navbar.js"></script>
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-800">
+    <!-- Main Content -->
+    <main class="mx-auto max-w-7xl space-y-6 px-4 pb-8 pt-8 sm:px-7">
+      <!-- Page Heading -->
+      <section class="brand-info">
+        <div>
+          <span class="page-eyebrow">إدارة الموارد البشرية</span>
+          <h1>إدارة الموظفين</h1>
+          <p>إدارة بيانات الموظفين والرواتب بسهولة واحترافية.</p>
+        </div>
+      </section>
+
+      <!-- Statistics -->
+      <section class="grid gap-4 sm:grid-cols-3">
+        <div class="stat-card ">
+          <div class="stat-icon">
+            <span class="material-symbols-outlined">groups</span>
+          </div>
+          <p>إجمالي الموظفين</p>
+          <strong id="count">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <span class="material-symbols-outlined">payments</span>
+          </div>
+          <p>إجمالي الرواتب</p>
+          <strong id="salarySum">0 ج.م</strong>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <span class="material-symbols-outlined">work</span>
+          </div>
+          <p>عدد الوظائف</p>
+          <strong id="roles">0</strong>
+        </div>
+      </section>
+      <!-- Search and Actions -->
+      <section class="navbar-actions">
+        <label class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="search-icon">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m16 16 4 4"></path>
+          </svg>
+
+          <input
+            id="search"
+            type="search"
+            placeholder="ابحث عن موظف أو وظيفة..."
+            aria-label="البحث عن موظف أو وظيفة"
+          />
+        </label>
+
+        <button id="newBtn" class="new-employee-btn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          <span>إضافة موظف جديد</span>
+        </button>
+      </section>
+
+      <!-- Employees Table -->
+      <section class="employee-panel">
+        <div class="panel-header">
+          <div>
+            <h2>قائمة الموظفين</h2>
+            <p>عرض بيانات فريق العمل وإدارتها وتحديثها.</p>
+          </div>
+
+          <label class="page-size">
+            <span>عدد العناصر</span>
+            <select id="pageSize">
+              <option>5</option>
+              <option selected>10</option>
+              <option>25</option>
+              <option value="all">الكل</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="employee-table">
+            <thead>
+              <tr>
+                <th>اسم الموظف</th>
+                <th>الوظيفة</th>
+                <th>الراتب</th>
+                <th>العنوان</th>
+                <th>الموبايل</th>
+                <th>الرصيد الافتتاحي</th>
+                <th class="text-center">الإجراءات</th>
+              </tr>
+            </thead>
+
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer">
+          <span>
+            عدد النتائج:
+            <b id="results">0</b>
+          </span>
+          <span>تُحفظ البيانات محليًا في هذا المتصفح</span>
+        </footer>
+      </section>
+    </main>
+
+    <!-- Employee Modal -->
+    <div
+      id="employeeModal"
+      class="hidden fixed inset-0 z-[1100] items-center justify-center bg-slate-900/45 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <section class="mx-auto max-w-2xl bg-white">
+        <div class="flex items-center justify-between px-6 py-5 text-black-500">
+          <div>
+            <h2 id="modalTitle" class="m-0 text-xl font-bold ">
+              إضافة موظف جديد
+            </h2>
+            <span class="block text-xs opacity-80">بيانات الموظف</span>
+          </div>
+          <button
+            id="closeModal"
+            type="button"
+            class="rounded-xl p-2 text-black/90 hover:bg-black/15"
+            aria-label="إغلاق"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <form id="employeeForm" class="space-y-4 p-6 bg-white">
+          <div
+            id="error"
+            class="hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700"
+          ></div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="space-y-1 text-sm font-bold">
+              <span>اسم الموظف</span>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="مثال : أحمد محمد"
+                required
+                class="w-full border px-4 py-3"
+              />
+            </label>
+
+            <label class="space-y-1 text-sm font-bold">
+              <span>الوظيفة</span>
+              <input
+                id="role"
+                name="role"
+                type="text"
+                placeholder="المهنة أو الوظيفة"
+                required
+                class="w-full border px-4 py-3"
+              />
+            </label>
+
+            <label class="space-y-1 text-sm font-bold">
+              <span>الراتب</span>
+              <input
+                id="salary"
+                name="salary"
+                type="number"
+                placeholder="المرتب"
+                min="0"
+                step="0.01"
+                required
+                class="w-full border px-4 py-3"
+              />
+            </label>
+
+            <label class="space-y-1 text-sm font-bold">
+              <span>الموبايل</span>
+              <input
+                id="mobile"
+                name="mobile"
+                type="tel"
+                placeholder=" مثال : 0123456789"
+                required
+                class="w-full border px-4 py-3"
+                dir="rtl"
+              />
+            </label>
+
+            <label class="space-y-1 text-sm font-bold sm:col-span-2">
+              <span>العنوان</span>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                placeholder="المدينة او العنوان "
+                required
+                class="w-full border px-4 py-3"
+              />
+            </label>
+
+            <label class="space-y-1 text-sm font-bold sm:col-span-2">
+              <span>الرصيد الافتتاحي</span>
+              <input
+                id="balance"
+                name="balance"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0"
+                required
+                class="w-full border px-4 py-3"
+              />
+            </label>
+          </div>
+
+          <div class="flex flex-row-reverse gap-3 pt-2">
+            <button type="submit" class="new-employee-btn">حفظ البيانات</button>
+            <button
+              id="cancelModal"
+              type="button"
+              class="rounded-xl border border-slate-200 px-5 py-3 font-bold text-slate-600 hover:bg-slate-50"
+            >
+              إلغاء
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../script/emb.js"></script>
+  </body>
+</html>

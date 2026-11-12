@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f8fafc" />
+    <title>MIZAN | إدارة الالتزامات</title>
+    <link rel="icon" href="pic/Mizan Logo 02.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../style/commitments.css" />
+    <script src="../script/unified-navbar.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="heading">
+        <div>
+          <span class="eyebrow">إدارة الشؤون المالية والقانونية</span>
+          <h1>إدارة الالتزامات</h1>
+          <p>
+            تسجيل التزامات العملاء ومتابعة المبالغ والبيانات المرتبطة بالقضايا.
+          </p>
+        </div>
+        <div class="actions">
+          <button id="printBtn" class="print-btn">
+            <span class="material-symbols-outlined">picture_as_pdf</span>طباعة
+            PDF
+          </button>
+          <button id="addBtn" class="add-btn">
+            <span class="material-symbols-outlined">add</span>إضافة التزام
+          </button>
+        </div>
+      </section>
+      <section class="stats">
+        <article class="stat">
+          <span class="material-symbols-outlined">receipt_long</span>
+          <p>إجمالي الالتزامات</p>
+          <strong id="totalCount">0</strong>
+        </article>
+        <article class="stat">
+          <span class="material-symbols-outlined">payments</span>
+          <p>إجمالي المبالغ</p>
+          <strong id="totalAmount">0.00 ج.م</strong>
+        </article>
+        <article class="stat">
+          <span class="material-symbols-outlined">groups</span>
+          <p>عدد العملاء</p>
+          <strong id="customerCount">0</strong>
+        </article>
+      </section>
+      <section class="toolbar">
+        <label class="search"
+          ><span class="material-symbols-outlined">search</span
+          ><input
+            id="searchInput"
+            type="search"
+            placeholder="ابحث باسم العميل أو رقم القضية أو البيان..."
+        /></label>
+        <label class="page-size"
+          >عدد العناصر
+          <select id="pageSize">
+            <option>5</option>
+            <option selected>10</option>
+            <option>25</option>
+            <option value="all">الكل</option>
+          </select></label
+        >
+      </section>
+      <section class="panel">
+        <header class="panel-head">
+          <div>
+            <h2>قائمة الالتزامات</h2>
+            <p>عرض ومراجعة التزامات العملاء المسجلة.</p>
+          </div>
+          <span>عدد النتائج: <b id="resultsCount">0</b></span>
+        </header>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>اسم العميل</th>
+                <th>التاريخ</th>
+                <th>رقم القضية</th>
+                <th>المبلغ</th>
+                <th>البيان</th>
+                <th class="action-head">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <footer class="table-foot">
+          <span>عدد النتائج المعروضة: <b id="shownCount">0</b></span
+          ><span>تُحفظ البيانات محليًا في هذا المتصفح</span>
+        </footer>
+      </section>
+    </main>
+
+    <div
+      id="modal"
+      class="overlay hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <section class="modal">
+        <header class="modal-head">
+          <div>
+            <span class="eyebrow">بيانات العميل والقضية</span>
+            <h2 id="modalTitle">إضافة التزام</h2>
+            <p>أدخل بيانات الالتزام ثم اضغط حفظ البيانات.</p>
+          </div>
+          <button id="closeBtn" class="close" type="button" aria-label="إغلاق">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <form id="commitmentForm">
+          <div id="error" class="error hidden"></div>
+          <div class="form-grid">
+            <label
+              >اسم العميل <i>*</i
+              ><input id="customerName" required placeholder="اكتب اسم العميل"
+            /></label>
+            <label
+              >رقم القضية <i>*</i
+              ><input id="caseNumber" required placeholder="مثال: 555-20"
+            /></label>
+            <label
+              >التاريخ <i>*</i><input id="date" type="date" required
+            /></label>
+            <label
+              >المبلغ (ج.م) <i>*</i
+              ><input
+                id="amount"
+                type="number"
+                min="0"
+                step=".01"
+                required
+                placeholder="0.00"
+            /></label>
+            <label class="wide"
+              >الالتزام <i>*</i
+              ><input id="commitment" required placeholder="اكتب وصف الالتزام"
+            /></label>
+            <label class="wide"
+              >البيان / تفاصيل إضافية<textarea
+                id="statement"
+                rows="3"
+                placeholder="اكتب تفاصيل إضافية إن وجدت"
+              ></textarea>
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button class="add-btn" type="submit">
+              <span class="material-symbols-outlined">save</span>حفظ البيانات</button
+            ><button id="cancelBtn" class="cancel" type="button">إلغاء</button>
+          </div>
+        </form>
+      </section>
+    </div>
+    <div id="toast" class="toast hidden"></div>
+    <script src="../script/commitments.js"></script>
+  </body>
+</html>

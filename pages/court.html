@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f7ff" />
+    <title>MIZAN | إدارة القضايا</title>
+    <link rel="icon" href="../pic/Mizan Logo 02.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../style/court.css" />
+    <script src="../script/unified-navbar.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="../index.html" aria-label="العودة للرئيسية">
+        <img src="../pic/Mizan Logo 02.png" alt="" />
+        <span>ميزان</span>
+      </a>
+      <div class="topbar-actions">
+        <a
+          class="icon-button"
+          href="../index.html"
+          title="الرئيسية"
+          aria-label="الرئيسية"
+        >
+          <span class="material-symbols-outlined">home</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="page-heading">
+        <div>
+          <span class="eyebrow">لوحة التحكم / القضايا</span>
+          <h1>إدارة القضايا</h1>
+          <p>تابع ملفات القضايا وبيانات العملاء من مكان واحد.</p>
+        </div>
+        <div class="heading-actions">
+          <button id="printButton" class="secondary-button" type="button">
+            <span class="material-symbols-outlined">print</span>
+            طباعة
+          </button>
+          <button id="openModal" class="primary-button" type="button">
+            <span class="material-symbols-outlined">add</span>
+            إضافة قضية
+          </button>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="ملخص القضايا">
+        <article class="stat-card">
+          <span class="stat-icon blue material-symbols-outlined"
+            >folder_open</span
+          >
+          <div>
+            <p>إجمالي القضايا</p>
+            <strong id="totalCount">0</strong>
+          </div>
+          <span class="stat-caption">ملف قضية</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon amber material-symbols-outlined"
+            >pending_actions</span
+          >
+          <div>
+            <p>قيد المتابعة</p>
+            <strong id="followingCount">0</strong>
+          </div>
+          <span class="stat-caption">تحتاج متابعة</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon green material-symbols-outlined"
+            >task_alt</span
+          >
+          <div>
+            <p>القضايا المكتملة</p>
+            <strong id="completedCount">0</strong>
+          </div>
+          <span class="stat-caption">تم الانتهاء منها</span>
+        </article>
+      </section>
+
+      <section class="directory-panel">
+        <div class="directory-heading">
+          <div>
+            <h2>سجل القضايا</h2>
+            <p>ابحث وفلتر وقم بتعديل بيانات القضايا المسجلة.</p>
+          </div>
+          <span class="live-indicator"><span></span>تحديث مباشر</span>
+        </div>
+
+        <div class="toolbar">
+          <label class="search-box" for="searchInput">
+            <span class="material-symbols-outlined">search</span>
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="ابحث باسم العميل أو رقم القضية..."
+              autocomplete="off"
+            />
+          </label>
+          <label class="select-control">
+            <span class="material-symbols-outlined">filter_list</span>
+            <select id="statusFilter" aria-label="تصفية حسب الحالة">
+              <option value="all">كل الحالات</option>
+              <option value="قيد المتابعة">قيد المتابعة</option>
+              <option value="تحتاج متابعة">تحتاج متابعة</option>
+              <option value="مكتملة">مكتملة</option>
+            </select>
+          </label>
+          <label class="select-control">
+            <span class="material-symbols-outlined">gavel</span>
+            <select id="typeFilter" aria-label="تصفية حسب النوع">
+              <option value="all">كل أنواع القضايا</option>
+              <option>مدني</option>
+              <option>تجاري</option>
+              <option>جنائي</option>
+              <option>شرعي</option>
+              <option>عمالي</option>
+              <option>إداري</option>
+              <option>أسرة</option>
+              <option>تعويضات</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>اسم العميل</th>
+                <th>صفة العميل</th>
+                <th>تاريخ التسجيل</th>
+                <th>الرقم المسلسل</th>
+                <th>رقم القضية</th>
+                <th>نوع القضية</th>
+                <th>المحكمة</th>
+                <th>الدائرة</th>
+                <th>موضوع الدعوى</th>
+                <th>محامي القضية</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="casesTable"></tbody>
+          </table>
+        </div>
+        <div id="caseCards" class="case-cards"></div>
+
+        <div class="directory-footer">
+          <p id="tableInfo" aria-live="polite">عرض 0 من 0 قضية</p>
+          <div class="pagination">
+            <label class="page-size-control"
+              ><span>لكل صفحة</span>
+              <select id="pageSize" aria-label="عدد القضايا في الصفحة">
+                <option value="6">6</option>
+                <option value="12">12</option>
+                <option value="24">24</option>
+              </select>
+            </label>
+            <button
+              id="previousPage"
+              class="page-button"
+              type="button"
+              aria-label="السابق"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+            <span id="pageIndicator" class="page-indicator">1 / 1</span>
+            <button
+              id="nextPage"
+              class="page-button"
+              type="button"
+              aria-label="التالي"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <a class="back-link" href="../index.html">
+        <span class="material-symbols-outlined">arrow_forward</span>
+        العودة إلى الصفحة الرئيسية
+      </a>
+    </main>
+
+    <div id="caseOverlay" class="case-overlay" aria-hidden="true"></div>
+    <section
+      id="caseModal"
+      class="case-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="caseModalTitle"
+      aria-hidden="true"
+    >
+  
+      <div class="modal-heading">
+        <div>
+          <span class="eyebrow">بيانات القضية</span>
+          <h2 id="caseModalTitle">إضافة قضية جديدة</h2>
+          <p>أدخل بيانات العميل والقضية والخصم.</p>
+        </div>
+        <button
+          id="closeModal"
+          class="icon-button close-button"
+          type="button"
+          aria-label="إغلاق"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="caseForm">
+        <div class="form-grid">
+          <label class="form-field"
+            ><span>اسم العميل <b>*</b></span
+            ><input
+              name="clientName"
+              required
+              maxlength="100"
+              placeholder="الاسم بالكامل"
+          /></label>
+          <label class="form-field"
+            ><span>صفة العميل <b>*</b></span
+            ><select name="clientRole" required>
+              <option value="">اختر الصفة</option>
+              <option>مدعي</option>
+              <option>مدعى عليه</option>
+              <option>طاعن</option>
+              <option>مطعون ضده</option>
+              <option>متهم</option>
+              <option>مجني عليه</option>
+              <option>مستأنف</option>
+              <option>مستأنف ضده</option>
+            </select></label
+          >
+          <label class="form-field"
+            ><span>هاتف العميل <b>*</b></span
+            ><input
+              name="clientPhone"
+              id="clientPhone"
+              required
+              maxlength="11"
+              inputmode="numeric"
+              placeholder="01XXXXXXXX"
+          /></label>
+          <label class="form-field"
+            ><span>تاريخ التسجيل <b>*</b></span
+            ><input name="registrationDate" type="date" required
+          /></label>
+          <label class="form-field"
+            ><span>نوع القضية <b>*</b></span
+            ><select name="caseType" required>
+              <option value="">اختر النوع</option>
+              <option>مدني</option>
+              <option>تجاري</option>
+              <option>جنائي</option>
+              <option>شرعي</option>
+              <option>عمالي</option>
+              <option>إداري</option>
+              <option>أسرة</option>
+              <option>تعويضات</option>
+            </select></label
+          >
+          <label class="form-field"
+            ><span>سنة القضية <b>*</b></span
+            ><input
+              name="caseYear"
+              required
+              maxlength="4"
+              inputmode="numeric"
+              placeholder="2026"
+          /></label>
+          <label class="form-field"
+            ><span>رقم القضية <b>*</b></span
+            ><input
+              name="caseNumber"
+              required
+              maxlength="30"
+              placeholder="رقم القضية"
+          /></label>
+          <label class="form-field"
+            ><span>المحكمة <b>*</b></span
+            ><input
+              name="court"
+              required
+              maxlength="100"
+              placeholder="اسم المحكمة"
+          /></label>
+          <label class="form-field"
+            ><span>الدائرة <b>*</b></span
+            ><input
+              name="circuit"
+              required
+              maxlength="100"
+              placeholder="اسم الدائرة"
+          /></label>
+          <label class="form-field full-field"
+            ><span>موضوع الدعوى <b>*</b></span
+            ><input
+              name="subject"
+              required
+              maxlength="200"
+              placeholder="موضوع الدعوى"
+          /></label>
+          <label class="form-field"
+            ><span>محامي القضية <b>*</b></span
+            ><input
+              name="lawyer"
+              required
+              maxlength="100"
+              placeholder="اسم المحامي"
+          /></label>
+          <label class="form-field"
+            ><span>الحالة</span
+            ><select name="status">
+              <option>قيد المتابعة</option>
+              <option>تحتاج متابعة</option>
+              <option>مكتملة</option>
+            </select></label
+          >
+          <label class="form-field"
+            ><span>اسم الخصم</span><input name="opponentName" maxlength="100"
+          /></label>
+          <label class="form-field"
+            ><span>هاتف الخصم</span
+            ><input name="opponentPhone" maxlength="11" inputmode="numeric"
+          /></label>
+          <label class="form-field full-field"
+            ><span>ملاحظات</span
+            ><textarea
+              name="notes"
+              maxlength="500"
+              rows="3"
+              placeholder="ملاحظات إضافية"
+            ></textarea>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button id="caseSubmitBtn" class="primary-button" type="submit">
+            حفظ القضية
+          </button>
+          <button id="cancelModal" class="secondary-button" type="button">
+            إلغاء
+          </button>
+        </div>
+      </form>
+    </section>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="../script/court.js"></script>
+  </body>
+</html>

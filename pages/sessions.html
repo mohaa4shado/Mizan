@@ -1,0 +1,516 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f8fafc" />
+
+  <title>MIZAN | إدارة الجلسات</title>
+
+  <link rel="icon" href="../pic/Mizan Logo 02.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="../style/sessions.css" />
+
+  <script src="../script/unified-navbar.js"></script>
+</head>
+
+<body>
+
+  <main class="page-shell">
+
+    <!-- Page Heading -->
+    <section class="page-heading">
+
+      <div>
+        <span class="page-eyebrow">إدارة القضايا والمواعيد</span>
+
+        <h1>إدارة الجلسات</h1>
+
+        <p>
+          متابعة مواعيد الجلسات وبيانات القضايا والعملاء بسهولة واحترافية.
+        </p>
+      </div>
+
+      <div class="heading-actions">
+
+        <button
+          id="printSessionsBtn"
+          class="print-btn"
+          type="button"
+        >
+          <span class="material-symbols-outlined">picture_as_pdf</span>
+          طباعة PDF
+        </button>
+
+        <button
+          id="addSessionBtn"
+          class="primary-btn"
+          type="button"
+        >
+          <span class="material-symbols-outlined">add</span>
+          إضافة جلسة
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Statistics -->
+    <section class="stats-grid">
+
+      <article class="stat-card">
+
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">event_note</span>
+        </div>
+
+        <p>إجمالي الجلسات</p>
+
+        <strong id="totalSessions">0</strong>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">today</span>
+        </div>
+
+        <p>جلسات اليوم</p>
+
+        <strong id="todaySessions">0</strong>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">calendar_month</span>
+        </div>
+
+        <p>الجلسات القادمة</p>
+
+        <strong id="upcomingSessions">0</strong>
+
+      </article>
+
+    </section>
+
+
+    <!-- Search Toolbar -->
+    <section class="toolbar">
+
+      <label class="search-box">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m16 16 4 4"></path>
+        </svg>
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="ابحث برقم القضية أو اسم العميل أو المحكمة..."
+          aria-label="البحث عن جلسة"
+        />
+
+      </label>
+
+
+      <label class="page-size">
+
+        <span>عدد العناصر</span>
+
+        <select id="pageSize">
+
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="all">الكل</option>
+
+        </select>
+
+      </label>
+
+    </section>
+
+
+    <!-- Sessions Table -->
+    <section class="table-panel">
+
+      <header class="panel-header">
+
+        <div>
+          <h2>جدول الجلسات</h2>
+
+          <p>جميع الجلسات المسجلة وبياناتها التفصيلية.</p>
+        </div>
+
+        <span class="records-label">
+
+          <span class="material-symbols-outlined">database</span>
+
+          سجل الجلسات
+
+        </span>
+
+      </header>
+
+
+      <div class="table-scroll">
+
+        <table class="sessions-table">
+
+          <thead>
+
+            <tr>
+              <th>رقم القضية</th>
+              <th>التاريخ</th>
+              <th>الوقت</th>
+              <th>اسم العميل</th>
+              <th>صفة العميل</th>
+              <th>موضوع الدعوى</th>
+              <th>المحكمة</th>
+              <th>الدائرة</th>
+              <th>المدينة</th>
+              <th>اسم الخصم</th>
+              <th class="actions-column">الإجراءات</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="sessionsRows"></tbody>
+
+        </table>
+
+      </div>
+
+
+      <footer class="table-footer">
+
+        <span>
+          عدد النتائج:
+          <b id="resultsCount">0</b>
+        </span>
+
+        <span>تُحفظ البيانات محليًا في هذا المتصفح</span>
+
+      </footer>
+
+    </section>
+
+  </main>
+
+
+
+  <!-- Add / Edit Session Modal -->
+  <div
+    id="sessionModal"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+  >
+
+    <section class="modal-card">
+
+      <header class="modal-header">
+
+        <div>
+
+          <span class="modal-eyebrow">بيانات الجلسة</span>
+
+          <h2 id="modalTitle">إضافة جلسة جديدة</h2>
+
+          <p>أدخل بيانات القضية والعميل وموعد الجلسة.</p>
+
+        </div>
+
+
+        <button
+          id="closeModal"
+          class="icon-close"
+          type="button"
+          aria-label="إغلاق"
+        >
+
+          <span class="material-symbols-outlined">close</span>
+
+        </button>
+
+      </header>
+
+
+
+      <form id="sessionForm">
+
+        <div
+          id="formError"
+          class="form-error hidden"
+          role="alert"
+        ></div>
+
+
+        <!-- Case Information -->
+        <div class="form-section">
+
+          <div class="section-title">
+
+            <span class="material-symbols-outlined">gavel</span>
+
+            <h3>بيانات القضية</h3>
+
+          </div>
+
+
+          <div class="form-grid">
+
+            <label class="field">
+
+              <span>رقم القضية <i>*</i></span>
+
+              <input
+                id="caseNumber"
+                name="caseNumber"
+                required
+                placeholder="مثال: 111-21"
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>موضوع الدعوى <i>*</i></span>
+
+              <input
+                id="subject"
+                name="subject"
+                required
+                placeholder="موضوع الدعوى"
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>المحكمة</span>
+
+              <input
+                id="court"
+                name="court"
+                placeholder="اسم المحكمة"
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>الدائرة</span>
+
+              <input
+                id="circuit"
+                name="circuit"
+                placeholder="اسم الدائرة"
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>المدينة</span>
+
+              <input
+                id="city"
+                name="city"
+                placeholder="المدينة"
+              />
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Client Information -->
+        <div class="form-section">
+
+          <div class="section-title">
+
+            <span class="material-symbols-outlined">person</span>
+
+            <h3>بيانات العميل والخصم</h3>
+
+          </div>
+
+
+          <div class="form-grid">
+
+            <label class="field">
+
+              <span>اسم العميل <i>*</i></span>
+
+              <input
+                id="clientName"
+                name="clientName"
+                required
+                placeholder="اسم العميل"
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>صفة العميل</span>
+
+              <select id="clientRole" name="clientRole">
+
+                <option value="">اختر صفة العميل</option>
+
+                <option>مدعي</option>
+                <option>مدعى عليه</option>
+                <option>متهم</option>
+                <option>مجني عليه</option>
+                <option>مستأنف</option>
+                <option>مستأنف ضده</option>
+                <option>طاعن</option>
+                <option>مطعون ضده</option>
+                <option>طالب</option>
+                <option>مطلوب ضده</option>
+
+              </select>
+
+            </label>
+
+
+            <label class="field">
+
+              <span>اسم الخصم</span>
+
+              <input
+                id="opponentName"
+                name="opponentName"
+                placeholder="اسم الخصم"
+              />
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Session Information -->
+        <div class="form-section">
+
+          <div class="section-title">
+
+            <span class="material-symbols-outlined">calendar_month</span>
+
+            <h3>بيانات الجلسة</h3>
+
+          </div>
+
+
+          <div class="form-grid form-grid-two">
+
+            <label class="field">
+
+              <span>تاريخ الجلسة <i>*</i></span>
+
+              <input
+                id="sessionDate"
+                name="sessionDate"
+                type="date"
+                required
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>وقت الجلسة <i>*</i></span>
+
+              <input
+                id="sessionTime"
+                name="sessionTime"
+                type="time"
+                required
+              />
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Form Actions -->
+        <footer class="modal-actions">
+
+          <button class="primary-btn" type="submit">
+
+            <span class="material-symbols-outlined">save</span>
+
+            حفظ البيانات
+
+          </button>
+
+
+          <button
+            id="cancelModal"
+            class="secondary-btn"
+            type="button"
+          >
+            إلغاء
+          </button>
+
+        </footer>
+
+      </form>
+
+    </section>
+
+  </div>
+
+
+
+  <!-- Toast -->
+  <div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+  ></div>
+
+
+
+  <script src="../script/sessions.js"></script>
+
+</body>
+</html>

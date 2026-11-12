@@ -1,0 +1,570 @@
+
+/* =========================================
+   MIZAN LOGIN PAGE
+   Dark Mode + Light Mode
+========================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --gold: #e7a64c;
+  --gold-light: #f2b65e;
+  --gold-dark: #87561b;
+
+  --dark-bg: #111820;
+  --dark-surface: #17212a;
+  --dark-text: #f4f6f8;
+  --dark-muted: #aab4bd;
+  --dark-border: rgba(255, 255, 255, 0.14);
+
+  --light-bg: #f3f5f7;
+  --light-surface: #ffffff;
+  --light-text: #202a33;
+  --light-muted: #687581;
+  --light-border: #d5dce2;
+
+  --input-bg: #ffffff;
+  --input-text: #252a2e;
+  --input-placeholder: #7b858d;
+
+  color-scheme: dark;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Tahoma, Arial, sans-serif;
+  background: var(--dark-bg);
+  color: var(--dark-text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* =========================================
+   DARK MODE
+========================================= */
+
+.login-bg {
+  background: radial-gradient(
+    ellipse at 50% 48%,
+    #2b3943 0%,
+    #18222b 48%,
+    #111820 100%
+  );
+  transition: background 0.3s ease;
+}
+
+header {
+  border-color: rgba(231, 166, 76, 0.55) !important;
+}
+
+header h1 {
+  color: var(--dark-muted);
+}
+
+/* =========================================
+   THEME BUTTON
+========================================= */
+
+.theme-toggle {
+  border: 1px solid rgba(231, 166, 76, 0.65);
+  background: rgba(20, 29, 37, 0.85);
+  color: var(--gold-light);
+  backdrop-filter: blur(10px);
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(231, 166, 76, 0.13);
+  border-color: var(--gold);
+}
+
+.theme-toggle svg {
+  color: inherit;
+  stroke: currentColor;
+}
+
+/* =========================================
+   PROFILE ICON
+========================================= */
+
+.profile-circle {
+  background: rgba(23, 33, 42, 0.75);
+  border-color: rgba(170, 180, 189, 0.55);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.profile-circle svg {
+  color: var(--dark-muted);
+  stroke: currentColor;
+}
+
+/* =========================================
+   INPUT FIELDS
+========================================= */
+
+.field {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--dark-border);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.3s ease;
+}
+
+.field:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(231, 166, 76, 0.2);
+}
+
+.field > span {
+  background: var(--dark-surface);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.12);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.field > span svg {
+  color: #ffffff;
+  stroke: currentColor;
+}
+
+.field input {
+  color: var(--input-text);
+  caret-color: var(--gold-dark);
+}
+
+.field input::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}
+
+.field input:focus {
+  outline: none;
+}
+
+/* Password icon */
+
+.password-toggle {
+  color: #59636c;
+  background: transparent;
+  border: none;
+}
+
+.password-toggle svg {
+  color: inherit;
+  stroke: currentColor;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: var(--gold-dark);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -4px;
+}
+
+/* =========================================
+   GOLD BUTTON
+   FIXED IN BOTH MODES
+========================================= */
+
+.gold-button {
+  background: linear-gradient(
+    180deg,
+    #f2b65e 0%,
+    #d8953d 48%,
+    #87561b 100%
+  );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.gold-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+}
+
+.gold-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.gold-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.gold-button:focus-visible {
+  outline: 3px solid rgba(231, 166, 76, 0.4);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   REMEMBER ME
+========================================= */
+
+.remember-label {
+  color: var(--dark-text);
+}
+
+.remember-box {
+  border-color: var(--dark-muted);
+  background: transparent;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.remember-label input:checked + .remember-box {
+  border-color: var(--gold);
+}
+
+.remember-label input:focus-visible + .remember-box {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   DIVIDER
+========================================= */
+
+.form-divider {
+  background: rgba(170, 180, 189, 0.55);
+}
+
+/* =========================================
+   MIZAN LOGO
+   ORIGINAL IMAGE COLORS
+========================================= */
+
+.mizan-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+
+  /* Never change original logo colors */
+  filter: none !important;
+  opacity: 1;
+}
+
+/* =========================================
+   FORM MESSAGES
+========================================= */
+
+#formMessage {
+  line-height: 1.8;
+}
+
+#usernameError,
+#passwordError {
+  color: #fb7185;
+}
+
+/* =========================================
+   TOAST
+========================================= */
+
+.toast {
+  animation: toastPop 0.25s ease-out;
+  backdrop-filter: blur(12px);
+}
+
+@keyframes toastPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* =========================================
+   LIGHT MODE
+========================================= */
+
+body.light-mode {
+  color-scheme: light;
+  background: var(--light-bg);
+  color: var(--light-text);
+}
+
+body.light-mode .login-bg {
+  background: radial-gradient(
+    ellipse at 50% 48%,
+    #ffffff 0%,
+    #f3f5f7 55%,
+    #e3e8ed 100%
+  );
+}
+
+/* Header */
+
+body.light-mode header {
+  border-color: rgba(197, 138, 55, 0.55) !important;
+}
+
+body.light-mode header h1 {
+  color: #46515b;
+}
+
+/* Theme button */
+
+body.light-mode .theme-toggle {
+  background: #ffffff;
+  color: #80551d;
+  border-color: #d5a04f;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .theme-toggle:hover {
+  background: #fff8ed;
+  border-color: var(--gold);
+}
+
+/* Profile */
+
+body.light-mode .profile-circle {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #d2d9df;
+  box-shadow: 0 12px 35px rgba(30, 45, 60, 0.07);
+}
+
+body.light-mode .profile-circle svg {
+  color: #687581;
+}
+
+/* Fields */
+
+body.light-mode .field {
+  background: #ffffff;
+  border-color: #cbd3da;
+  color: #26313a;
+}
+
+body.light-mode .field:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(231, 166, 76, 0.18);
+}
+
+body.light-mode .field > span {
+  background: #e9edf1;
+  color: #465560;
+  border-color: #d2d9df;
+}
+
+body.light-mode .field > span svg {
+  color: #465560;
+}
+
+body.light-mode .field input {
+  color: #202a33;
+}
+
+body.light-mode .field input::placeholder {
+  color: #7b858d;
+}
+
+/* Password icon */
+
+body.light-mode .password-toggle {
+  color: #59636c;
+}
+
+body.light-mode .password-toggle:hover {
+  color: #202a33;
+}
+
+/* Remember me */
+
+body.light-mode .remember-label {
+  color: #303b44;
+}
+
+body.light-mode .remember-box {
+  border-color: #7b858d;
+}
+
+/* Divider */
+
+body.light-mode .form-divider {
+  background: #c3cbd2;
+}
+
+/* Forgot password */
+
+body.light-mode #forgotPassword {
+  color: #46515b;
+}
+
+body.light-mode #forgotPassword:hover {
+  color: var(--gold-dark);
+}
+
+/* Toast */
+
+body.light-mode #toast {
+  background: #ffffff;
+  color: #26313a;
+  border-color: #d6dde3;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal-panel {
+  background: var(--dark-surface);
+  color: var(--dark-text);
+  border: 1px solid rgba(231, 166, 76, 0.45);
+}
+
+.modal-copy,
+.modal-label {
+  color: var(--dark-muted);
+}
+
+.modal-close {
+  color: var(--dark-muted);
+  background: transparent;
+  border: none;
+}
+
+.modal-close:hover {
+  color: var(--gold-light);
+}
+
+.modal-input {
+  background: var(--dark-bg);
+  color: var(--dark-text);
+  border: 1px solid var(--dark-border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(231, 166, 76, 0.15);
+}
+
+.modal-input::placeholder {
+  color: var(--dark-muted);
+}
+
+/* Light Modal */
+
+body.light-mode .modal-panel {
+  background: #ffffff;
+  color: #26313a;
+  border-color: #d5a04f;
+}
+
+body.light-mode .modal-copy,
+body.light-mode .modal-label {
+  color: #4f5b65;
+}
+
+body.light-mode .modal-close {
+  color: #56616a;
+}
+
+body.light-mode .modal-input {
+  background: #f5f7f9;
+  color: #202a33;
+  border-color: #cbd2d8;
+}
+
+body.light-mode .modal-input::placeholder {
+  color: #87919a;
+}
+
+body.light-mode .modal-input:focus {
+  border-color: var(--gold);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 640px) {
+  .theme-toggle {
+    left: 12px;
+    padding: 8px;
+  }
+
+  .profile-circle {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-circle svg {
+    width: 76px;
+    height: 76px;
+  }
+
+  .field {
+    height: 62px;
+  }
+
+  .field > span {
+    width: 65px;
+  }
+
+  .gold-button {
+    height: 62px;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+:focus-visible {
+  outline-color: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

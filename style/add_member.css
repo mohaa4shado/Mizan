@@ -1,0 +1,259 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--mizan-text-primary, #172b4d);
+  background:
+    radial-gradient(ellipse at 10% 8%, rgba(14, 165, 233, 0.1), transparent 34rem),
+    var(--mizan-bg, #f2f7ff);
+  font-family: "Tajawal", "Cairo", sans-serif;
+  padding-top: 100px;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #123452;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.brand-link img {
+  width: 2.6rem;
+  height: 2.6rem;
+  object-fit: contain;
+}
+
+.home-link,
+.profile-avatar {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #dceaf5;
+  border-radius: 50%;
+  background: #f0f9ff;
+  color: #0369a1;
+}
+
+.home-link {
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-link:hover {
+  transform: translateY(-2px);
+  background: #e0f2fe;
+}
+
+.home-link .material-symbols-outlined {
+  font-size: 1.35rem;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-shell {
+  animation: pageEnter 0.45s ease both;
+}
+
+.page-shell > #realContent > div:nth-child(2) {
+  box-shadow: 0 24px 70px rgba(23, 43, 77, 0.08);
+}
+
+.page-shell input {
+  min-width: 0;
+}
+
+.page-shell input:focus {
+  outline: none;
+}
+
+.page-shell form > div:first-child > div > div:focus-within {
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
+}
+
+.permission-card {
+  display: flex;
+  min-height: 4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  text-align: right;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.permission-card:hover {
+  transform: translateY(-2px);
+  border-color: #7dd3fc;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.1);
+}
+
+.permission-card:focus-visible,
+.secondary-action:focus-visible,
+.home-link:focus-visible {
+  outline: 3px solid rgba(14, 165, 233, 0.4);
+  outline-offset: 2px;
+}
+
+.permission-card.active {
+  border-color: #0ea5e9;
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.permission-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.permission-indicator {
+  position: relative;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  border: 2px solid #7dd3fc;
+  border-radius: 50%;
+}
+
+.permission-indicator::after {
+  position: absolute;
+  inset: 0.22rem;
+  border-radius: 50%;
+  background: #0284c7;
+  content: "";
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.permission-card.active .permission-indicator {
+  border-color: #0284c7;
+}
+
+.permission-card.active .permission-indicator::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.secondary-action {
+  border: 0;
+  border-radius: 9999px;
+  background: #f0f9ff;
+  padding: 0.45rem 0.9rem;
+  color: #0369a1;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-action:hover {
+  background: #e0f2fe;
+}
+
+.form-message {
+  border: 1px solid #bae6fd;
+  border-radius: 1rem;
+  background: #f0f9ff;
+  padding: 0.9rem 1rem;
+  color: #075985;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form-message:not(.hidden) {
+  animation: messageEnter 0.25s ease both;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes messageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= Permissions ================= */
+
+.permission-card.active {
+  transform: translateY(-1px);
+}
+
+/* ================= Skeleton ================= */
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #e2e8f0 25%,
+    #f8fafc 37%,
+    #e2e8f0 63%
+  );
+
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@media (max-width: 640px) {
+  .brand-link span {
+    display: none;
+  }
+
+  .page-shell > #realContent > div:nth-child(2) {
+    border-radius: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

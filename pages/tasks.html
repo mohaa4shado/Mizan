@@ -1,0 +1,330 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f8fafc" />
+  <title>MIZAN | مهام الموظفين</title>
+
+  <link rel="icon" href="../pic/Mizan Logo 02.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="../style/tasks.css" />
+  <script src="../script/unified-navbar.js"></script>
+</head>
+
+<body>
+  <main class="page-shell">
+
+    <!-- Page Heading -->
+    <section class="page-heading">
+      <div>
+        <span class="page-eyebrow">إدارة الموارد البشرية</span>
+        <h1>مهام الموظفين</h1>
+        <p>توزيع المهام على فريق العمل ومتابعة تفاصيلها ومواعيد تنفيذها.</p>
+      </div>
+
+      <div class="heading-actions">
+        <button id="printTasksBtn" class="print-btn" type="button">
+          <span class="material-symbols-outlined">picture_as_pdf</span>
+          طباعة PDF
+        </button>
+
+        <button id="addTaskBtn" class="primary-btn" type="button">
+          <span class="material-symbols-outlined">add</span>
+          إضافة مهمة للموظف
+        </button>
+      </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="stats-grid">
+      <article class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">assignment</span>
+        </div>
+        <p>إجمالي المهام</p>
+        <strong id="totalTasks">0</strong>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">task_alt</span>
+        </div>
+        <p>المهام المنجزة</p>
+        <strong id="doneTasks">0</strong>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">pending_actions</span>
+        </div>
+        <p>المهام المتبقية</p>
+        <strong id="pendingTasks">0</strong>
+      </article>
+    </section>
+
+    <!-- Search and Filters -->
+    <section class="toolbar">
+
+      <label class="search-box">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m16 16 4 4"></path>
+        </svg>
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="ابحث باسم الموظف أو عنوان المهمة أو التفاصيل..."
+          aria-label="البحث عن مهمة"
+        />
+      </label>
+
+      <label class="filter-box">
+        <span>حالة المهمة</span>
+        <select id="statusFilter">
+          <option value="all">كل الحالات</option>
+          <option value="done">تم</option>
+          <option value="pending">باقي</option>
+        </select>
+      </label>
+
+      <!-- Date Filter -->
+      <div class="date-filter">
+        <label for="dateFilter">تصفية بالتاريخ</label>
+
+        <div class="date-filter-controls">
+          <input
+            type="date"
+            id="dateFilter"
+            aria-label="اختيار تاريخ المهام"
+          />
+
+          <button
+            type="button"
+            id="clearDateFilter"
+            class="clear-date-btn"
+            title="عرض جميع التواريخ"
+            aria-label="مسح التاريخ"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      </div>
+
+      <label class="page-size">
+        <span>عدد العناصر</span>
+        <select id="pageSize">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="all">الكل</option>
+        </select>
+      </label>
+
+    </section>
+
+    <!-- Tasks Table -->
+    <section class="table-panel">
+
+      <header class="panel-header">
+        <div>
+          <h2>قائمة مهام الموظفين</h2>
+          <p>عرض المهام المسندة إلى الموظفين ومتابعة حالة كل مهمة.</p>
+        </div>
+
+        <span class="records-label">
+          <span class="material-symbols-outlined">format_list_bulleted</span>
+          سجل المهام
+        </span>
+      </header>
+
+      <div class="table-scroll">
+        <table class="tasks-table">
+          <thead>
+            <tr>
+              <th>اسم الموظف</th>
+              <th>عنوان المهمة</th>
+              <th>تفصيل المهمة</th>
+              <th>التاريخ</th>
+              <th>الوقت</th>
+              <th>الحالة</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+
+          <tbody id="tasksRows"></tbody>
+        </table>
+      </div>
+
+      <footer class="table-footer">
+        <span>
+          عدد النتائج:
+          <b id="resultsCount">0</b>
+        </span>
+
+        <span>تُحفظ البيانات محليًا في هذا المتصفح</span>
+      </footer>
+
+    </section>
+  </main>
+
+  <!-- Add / Edit Task Modal -->
+  <div
+    id="taskModal"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+  >
+    <section class="modal-card">
+
+      <header class="modal-header">
+        <div>
+          <span class="modal-eyebrow">إدارة وتوزيع الأعمال</span>
+          <h2 id="modalTitle">إضافة مهمة موظف</h2>
+          <p>أدخل بيانات الموظف والمهمة والموعد المحدد.</p>
+        </div>
+
+        <button
+          id="closeModal"
+          class="icon-close"
+          type="button"
+          aria-label="إغلاق"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <form id="taskForm">
+
+        <div id="formError" class="form-error hidden" role="alert"></div>
+
+        <div class="form-layout">
+
+          <!-- Employee Information -->
+          <div class="form-section">
+            <div class="section-title">
+              <span class="material-symbols-outlined">badge</span>
+              <h3>بيانات الموظف</h3>
+            </div>
+
+            <div class="form-grid">
+              <label class="field full-field">
+                <span>اسم الموظف <i>*</i></span>
+
+                <input
+                  id="employeeName"
+                  name="employeeName"
+                  type="text"
+                  required
+                  autocomplete="off"
+                  placeholder="اكتب اسم الموظف بالكامل"
+                />
+              </label>
+            </div>
+          </div>
+
+          <!-- Task Information -->
+          <div class="form-section">
+            <div class="section-title">
+              <span class="material-symbols-outlined">assignment</span>
+              <h3>بيانات المهمة</h3>
+            </div>
+
+            <div class="form-grid">
+
+              <label class="field">
+                <span>عنوان المهمة <i>*</i></span>
+                <input
+                  id="taskTitle"
+                  name="taskTitle"
+                  type="text"
+                  required
+                  placeholder="مثال: تجهيز ملف قضية"
+                />
+              </label>
+
+              <label class="field">
+                <span>تاريخ التنفيذ <i>*</i></span>
+                <input
+                  id="taskDate"
+                  name="taskDate"
+                  type="date"
+                  required
+                />
+              </label>
+
+              <label class="field">
+                <span>وقت التنفيذ <i>*</i></span>
+                <input
+                  id="taskTime"
+                  name="taskTime"
+                  type="time"
+                  required
+                />
+              </label>
+
+              <label class="field">
+                <span>حالة المهمة</span>
+                <select id="taskStatus" name="taskStatus">
+                  <option value="pending">باقي</option>
+                  <option value="done">تم</option>
+                </select>
+              </label>
+
+              <label class="field full-field">
+                <span>تفصيل المهمة <i>*</i></span>
+                <textarea
+                  id="taskDetails"
+                  name="taskDetails"
+                  rows="4"
+                  required
+                  placeholder="اكتب تفاصيل المهمة والتعليمات المطلوبة من الموظف..."
+                ></textarea>
+              </label>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Modal Actions -->
+        <footer class="modal-actions">
+          <button class="primary-btn" type="submit">
+            <span class="material-symbols-outlined">save</span>
+            حفظ المهمة
+          </button>
+
+          <button
+            id="cancelModal"
+            class="secondary-btn"
+            type="button"
+          >
+            إلغاء
+          </button>
+        </footer>
+
+      </form>
+    </section>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="../script/tasks.js"></script>
+</body>
+</html>

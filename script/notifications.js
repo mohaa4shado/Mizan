@@ -65,44 +65,71 @@
     setTimeout(() => {
       overlayEl.classList.add("hidden");
       modalEl.classList.add("hidden");
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     }, 300);
   }
 
-  // Expose to window so index.html inline wiring can call it
+  // Expose to window so page inline wiring and the navbar can call them.
   window.openNotifications = openNotifications;
-  window.closeModal = closeNotificationsModal;
+  window.closeNotificationsModal = closeNotificationsModal;
+
+  // Keep a page-specific closeModal (e.g. the agencies page) intact.
+  if (typeof window.closeModal !== "function") {
+    window.closeModal = closeNotificationsModal;
+  }
 })();
 
 (function () {
-  const notificationBtn = document
-    .querySelector('span[data-icon="notifications"]')
-    ?.closest("button");
-  if (!notificationBtn) return;
+  // The notification button may be injected later (unified navbar),
+  // so never let a missing button prevent the close wiring below.
+  function bindNotificationButton() {
+    const notificationBtn = document
+      .querySelector('span[data-icon="notifications"]')
+      ?.closest("button");
 
-  notificationBtn.addEventListener("click", function () {
-    if (typeof openNotifications === "function") {
-      openNotifications();
+    if (!notificationBtn || notificationBtn.dataset.mizanBound === "1") {
+      return;
     }
-  });
+
+    notificationBtn.dataset.mizanBound = "1";
+    notificationBtn.addEventListener("click", function () {
+      window.openNotifications?.();
+    });
+  }
+
+  bindNotificationButton();
+
+  document.addEventListener("DOMContentLoaded", bindNotificationButton);
+  document.addEventListener("click", bindNotificationButton, true);
 
   const closeBtn = document.getElementById("closeModalBtn");
-  if (closeBtn && typeof closeModal === "function") {
-    closeBtn.addEventListener("click", closeModal);
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function () {
+      window.closeNotificationsModal?.();
+    });
   }
 
   const overlayEl = document.getElementById("overlay");
   if (overlayEl) {
     overlayEl.addEventListener("click", function (e) {
-      if (e.target === overlayEl && typeof closeModal === "function") {
-        closeModal();
+      if (e.target === overlayEl) {
+        window.closeNotificationsModal?.();
       }
     });
   }
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && typeof closeModal === "function") {
-      closeModal();
+    if (e.key !== "Escape") return;
+
+    const notificationModal = document.getElementById("modal");
+    const notificationOverlay = document.getElementById("overlay");
+
+    if (
+      notificationModal &&
+      !notificationModal.classList.contains("hidden") &&
+      notificationOverlay
+    ) {
+      window.closeNotificationsModal?.();
     }
   });
 })();

@@ -1,4 +1,4 @@
-
+﻿
 /* ========================================
    MIZAN - Employee Tasks
 ======================================== */
@@ -983,140 +983,10 @@ button:focus-visible {
 }
 
 /* ========================================
-   PDF / Print
-======================================== */
+   PDF / Print styles live in tasks-print.css
+   (dedicated A4 portrait report stylesheet)
+   ======================================== */
 
-@media print {
-  @page {
-    size: A4 landscape;
-    margin: 12mm;
-  }
-
-  html,
-  body {
-    width: 100%;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: #fff !important;
-    color: #000 !important;
-    font-family: "Cairo", sans-serif !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .page-shell {
-    width: 100% !important;
-    max-width: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .heading-actions,
-  .toolbar,
-  .modal,
-  .toast,
-  .table-actions,
-  .records-label,
-  .date-filter,
-  #clearDateFilter,
-  #dateFilter {
-    display: none !important;
-  }
-
-  .page-heading {
-    display: block !important;
-    margin-bottom: 20px !important;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #1e40af;
-  }
-
-  .page-heading h1 {
-    font-size: 24px !important;
-    color: #172033 !important;
-  }
-
-  .page-heading p {
-    font-size: 12px !important;
-  }
-
-  .page-eyebrow {
-    color: #1d4ed8 !important;
-    margin-top: 0 !important;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 10px !important;
-    margin-bottom: 20px !important;
-  }
-
-  .stat-card {
-    padding: 12px !important;
-    border: 1px solid #ddd !important;
-    box-shadow: none !important;
-    break-inside: avoid;
-  }
-
-  .stat-icon {
-    display: none !important;
-  }
-
-  .table-panel {
-    overflow: visible !important;
-    border: 1px solid #ddd !important;
-    box-shadow: none !important;
-  }
-
-  .panel-header {
-    padding: 12px !important;
-  }
-
-  .table-scroll {
-    overflow: visible !important;
-  }
-
-  .tasks-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    border-collapse: collapse !important;
-    font-size: 10px !important;
-  }
-
-  .tasks-table thead {
-    display: table-header-group;
-    background: #f1f5f9 !important;
-  }
-
-  .tasks-table th,
-  .tasks-table td {
-    padding: 9px 6px !important;
-    border: 1px solid #ddd !important;
-    color: #222 !important;
-  }
-
-  .tasks-table tr {
-    break-inside: avoid;
-  }
-
-  .tasks-table tbody tr:hover {
-    background: transparent !important;
-  }
-
-  .status-badge {
-    border: 1px solid #ddd;
-    background: transparent !important;
-    color: #222 !important;
-  }
-
-  .table-footer {
-    padding: 10px !important;
-    background: #fff !important;
-  }
-
-  .empty-state {
-    padding: 15px !important;
-  }
-}
 
 /* ========================================
    Reduced Motion

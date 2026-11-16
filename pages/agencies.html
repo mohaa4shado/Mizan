@@ -1,48 +1,97 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f5f7fb" />
+
     <title>MIZAN | إدارة التوكيلات</title>
+
     <link rel="icon" href="../pic/Mizan Logo 02.png" />
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Cairo Font -->
     <link
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Material Symbols Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+
+    <!-- Page CSS -->
     <link rel="stylesheet" href="../style/agencies.css" />
+    <link rel="stylesheet" href="../style/modal-system.css" />
+
+    <!-- Material Symbols Settings -->
+    <style>
+      .material-symbols-outlined {
+        font-family: "Material Symbols Outlined";
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        direction: ltr;
+        -webkit-font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+        font-feature-settings: "liga";
+      }
+    </style>
   </head>
 
   <body>
     <div class="min-h-screen">
+
       <!-- Header -->
+      <header class="topbar">
 
-       <header class="topbar">
-      <a class="brand" href="../index.html" aria-label="العودة للرئيسية">
-        <img src="../pic/Mizan Logo 02.png" alt="" />
-      </a>
-      <div class="topbar-actions">
         <a
-          class="icon-button home-link"
+          class="brand"
           href="../index.html"
-          title="الرئيسية"
-          aria-label="الرئيسية"
+          aria-label="العودة للرئيسية"
         >
-          <span class="material-symbols-outlined" aria-hidden="true">home</span>
+          <img src="../pic/Mizan Logo 02.png" alt="MIZAN" />
         </a>
-      </div>
-    </header>
 
-      <!-- Main -->
+        <div class="topbar-actions">
 
+          <a
+            class="icon-button home-link"
+            href="../index.html"
+            title="الرئيسية"
+            aria-label="الرئيسية"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">
+              home
+            </span>
+          </a>
+
+        </div>
+      </header>
+
+      <!-- Main Content -->
       <main class="mx-auto max-w-7xl px-5 py-8">
+
+        <!-- Page Heading -->
         <div
           class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div>
+
             <p class="text-sm font-bold text-blue-600 mb-1">
               إدارة المستندات القانونية
             </p>
@@ -54,75 +103,97 @@
             <p class="mt-2 text-sm text-slate-500">
               عرض وتنظيم توكيلات العملاء داخل المكتب.
             </p>
+
           </div>
 
           <!-- Top Buttons -->
+          <div
+            class="flex flex-wrap items-center gap-3 self-start no-print"
+          >
 
-          <div class="flex flex-wrap items-center gap-3 self-start no-print">
             <button
               id="printPDF"
               type="button"
               class="btn-secondary inline-flex items-center justify-center gap-2"
             >
-              <span>⎙</span>
+              <span class="material-symbols-outlined text-xl">
+                print
+              </span>
               طباعة PDF
             </button>
 
             <button
               id="openModal"
+              type="button"
               class="btn-primary inline-flex items-center justify-center gap-2"
             >
-              <span class="text-xl leading-none">＋</span>
+              <span class="material-symbols-outlined text-xl">
+                add
+              </span>
               إضافة توكيل
             </button>
+
           </div>
         </div>
 
         <!-- Table Panel -->
-
         <section class="panel overflow-hidden">
+
+          <!-- Panel Header -->
           <div
             class="p-5 sm:p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100"
           >
+
             <div class="flex items-center gap-3">
+
               <div
-                class="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"
+                class="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
               >
-                ▤
+                <span class="material-symbols-outlined">
+                  description
+                </span>
               </div>
 
               <div>
-                <h2 class="font-extrabold text-slate-800">قائمة التوكيلات</h2>
+
+                <h2 class="font-extrabold text-slate-800">
+                  قائمة التوكيلات
+                </h2>
 
                 <p class="text-xs text-slate-500 mt-1">
-                  <span id="recordCount">4</span> توكيلات مسجلة
+                  <span id="recordCount">4</span>
+                  توكيلات مسجلة
                 </p>
+
               </div>
             </div>
 
             <!-- Search -->
-
             <div class="relative w-full sm:max-w-xs no-print">
+
               <span
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
               >
-                ⌕
+                search
               </span>
 
               <input
                 id="searchInput"
-                class="field pr-9"
+                class="field pr-10"
                 type="search"
                 placeholder="ابحث باسم العميل أو رقم التوكيل..."
                 aria-label="بحث في التوكيلات"
               />
+
             </div>
+
           </div>
 
           <!-- Table -->
-
           <div class="table-wrap">
+
             <table>
+
               <thead>
                 <tr>
                   <th>اسم العميل</th>
@@ -134,10 +205,18 @@
               </thead>
 
               <tbody id="agencyTable">
+
                 <tr>
-                  <td class="font-bold text-slate-700">تامر حسني</td>
-                  <td>3000 / ب / 2010 / رسمي عام بورسعيد</td>
+                  <td class="font-bold text-slate-700">
+                    تامر حسني
+                  </td>
+
+                  <td>
+                    3000 / ب / 2010 / رسمي عام بورسعيد
+                  </td>
+
                   <td>2026/04/08</td>
+
                   <td>
                     <span
                       class="rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-bold"
@@ -148,9 +227,16 @@
                 </tr>
 
                 <tr>
-                  <td class="font-bold text-slate-700">عادل الفار</td>
-                  <td>1234 / س / 2025 / قصر النيل</td>
+                  <td class="font-bold text-slate-700">
+                    عادل الفار
+                  </td>
+
+                  <td>
+                    1234 / س / 2025 / قصر النيل
+                  </td>
+
                   <td>2026/05/03</td>
+
                   <td>
                     <span
                       class="rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-bold"
@@ -161,9 +247,16 @@
                 </tr>
 
                 <tr>
-                  <td class="font-bold text-slate-700">بهاء سلطان</td>
-                  <td>4321 / ب / 2016 / بروڤوفاد</td>
+                  <td class="font-bold text-slate-700">
+                    بهاء سلطان
+                  </td>
+
+                  <td>
+                    4321 / ب / 2016 / بروڤوفاد
+                  </td>
+
                   <td>2026/05/05</td>
+
                   <td>
                     <span
                       class="rounded-full bg-violet-50 text-violet-700 px-3 py-1 text-xs font-bold"
@@ -174,9 +267,16 @@
                 </tr>
 
                 <tr>
-                  <td class="font-bold text-slate-700">خالد علي</td>
-                  <td>3579 / س / 2026 / بورسعيد</td>
+                  <td class="font-bold text-slate-700">
+                    خالد علي
+                  </td>
+
+                  <td>
+                    3579 / س / 2026 / بورسعيد
+                  </td>
+
                   <td>2026/06/09</td>
+
                   <td>
                     <span
                       class="rounded-full bg-amber-50 text-amber-700 px-3 py-1 text-xs font-bold"
@@ -185,10 +285,13 @@
                     </span>
                   </td>
                 </tr>
+
               </tbody>
             </table>
+
           </div>
 
+          <!-- Empty State -->
           <div
             id="emptyState"
             class="hidden py-12 text-center text-sm text-slate-500"
@@ -196,51 +299,75 @@
             لا توجد نتائج مطابقة لبحثك.
           </div>
 
+          <!-- Footer -->
           <div
             class="border-t border-slate-100 px-5 py-4 text-xs text-slate-400"
           >
             يمكنك إضافة أو تعديل أو حذف التوكيلات من خلال الإجراءات المتاحة.
           </div>
+
         </section>
       </main>
     </div>
 
     <!-- Add / Edit Modal -->
+    <div
+      id="modalBackdrop"
+      class="modal-backdrop mt-16 mizan-overlay"
+      aria-hidden="true"
+    >
 
-    <div id="modalBackdrop" class="modal-backdrop mt-16" aria-hidden="true">
       <section
-        class="modal"
+        class="modal mizan-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modalTitle"
       >
+
+        <!-- Modal Header -->
         <div class="modal-head">
+
           <div>
-            <h2 h2 id="modalTitle" class="text-xl font-extrabold text-slate-800">
+
+            <h2
+              id="modalTitle"
+              class="text-xl font-extrabold text-slate-800"
+            >
               إضافة توكيل جديد
             </h2>
 
             <p class="text-sm text-slate-500 mt-1">
               أدخل بيانات التوكيل المطلوبة
             </p>
+
           </div>
 
           <button
             id="closeModal"
             type="button"
-            class="h-9 w-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 text-xl"
+            class="h-9 w-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500"
             aria-label="إغلاق"
           >
-            ×
+            <span class="material-symbols-outlined">
+              close
+            </span>
           </button>
+
         </div>
 
+        <!-- Modal Form -->
         <form id="agencyForm">
+
           <div class="modal-body">
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+              <!-- Client Name -->
               <div class="sm:col-span-2">
+
                 <label class="field-label" for="clientName">
-                  اسم العميل <span class="text-red-500">*</span>
+                  اسم العميل
+                  <span class="text-red-500">*</span>
                 </label>
 
                 <input
@@ -258,11 +385,15 @@
                   <option value="بهاء سلطان"></option>
                   <option value="خالد علي"></option>
                 </datalist>
+
               </div>
 
+              <!-- Agency Number -->
               <div class="sm:col-span-2">
+
                 <label class="field-label" for="agencyNumber">
-                  رقم التوكيل <span class="text-red-500">*</span>
+                  رقم التوكيل
+                  <span class="text-red-500">*</span>
                 </label>
 
                 <input
@@ -272,11 +403,15 @@
                   placeholder="مثال: 3000 / ب / 2026 / بورسعيد"
                   required
                 />
+
               </div>
 
+              <!-- Date -->
               <div>
+
                 <label class="field-label" for="agencyDate">
-                  التاريخ <span class="text-red-500">*</span>
+                  التاريخ
+                  <span class="text-red-500">*</span>
                 </label>
 
                 <input
@@ -286,11 +421,15 @@
                   class="field"
                   required
                 />
+
               </div>
 
+              <!-- Agency Type -->
               <div>
+
                 <label class="field-label" for="agencyType">
-                  نوع التوكيل <span class="text-red-500">*</span>
+                  نوع التوكيل
+                  <span class="text-red-500">*</span>
                 </label>
 
                 <select
@@ -299,7 +438,11 @@
                   class="field"
                   required
                 >
-                  <option value="">اختر نوع التوكيل</option>
+
+                  <option value="">
+                    اختر نوع التوكيل
+                  </option>
+
                   <option>عام</option>
                   <option>رسمي خاص</option>
                   <option>رسمي عام قضايا</option>
@@ -308,10 +451,14 @@
                   <option>بيع</option>
                   <option>شراء</option>
                   <option>أخرى</option>
+
                 </select>
+
               </div>
 
+              <!-- Notarization Place -->
               <div>
+
                 <label class="field-label" for="notarizationPlace">
                   مكان التوثيق
                 </label>
@@ -322,10 +469,15 @@
                   class="field"
                   placeholder="مثال: بورسعيد"
                 />
+
               </div>
 
+              <!-- Number -->
               <div>
-                <label class="field-label" for="numberPart"> الرقم </label>
+
+                <label class="field-label" for="numberPart">
+                  الرقم
+                </label>
 
                 <input
                   id="numberPart"
@@ -334,10 +486,15 @@
                   inputmode="numeric"
                   placeholder="رقم التوكيل"
                 />
+
               </div>
 
+              <!-- Letter -->
               <div>
-                <label class="field-label" for="letterPart"> الحرف </label>
+
+                <label class="field-label" for="letterPart">
+                  الحرف
+                </label>
 
                 <input
                   id="letterPart"
@@ -345,10 +502,15 @@
                   class="field"
                   placeholder="الحرف"
                 />
+
               </div>
 
+              <!-- Year -->
               <div>
-                <label class="field-label" for="yearPart"> السنة </label>
+
+                <label class="field-label" for="yearPart">
+                  السنة
+                </label>
 
                 <input
                   id="yearPart"
@@ -357,35 +519,56 @@
                   inputmode="numeric"
                   placeholder="2026"
                 />
+
               </div>
+
             </div>
 
             <p class="mt-4 text-xs text-slate-400">
               الحقول التي بجانبها علامة (*) مطلوبة.
             </p>
+
           </div>
 
+          <!-- Modal Footer -->
           <div class="modal-foot">
-            <button type="submit" id="saveButton" class="btn-primary">
+
+            <button
+              type="submit"
+              id="saveButton"
+              class="btn-primary"
+            >
               حفظ التوكيل
             </button>
 
-            <button id="cancelModal" type="button" class="btn-secondary">
+            <button
+              id="cancelModal"
+              type="button"
+              class="btn-secondary"
+            >
               إلغاء
             </button>
+
           </div>
+
         </form>
       </section>
     </div>
 
     <!-- Toast -->
-
-    <div id="toast" class="toast" role="status" aria-live="polite">
+    <div
+      id="toast"
+      class="toast"
+      role="status"
+      aria-live="polite"
+    >
       تم تنفيذ العملية بنجاح
     </div>
 
+    <!-- JavaScript Files -->
     <script src="../script/agencies.js"></script>
-      <script src="../script/notifications.js"></script>
+    <script src="../script/notifications.js"></script>
     <script src="../script/unified-navbar.js"></script>
+
   </body>
 </html>

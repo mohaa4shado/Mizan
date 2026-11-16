@@ -27,17 +27,17 @@
             <span class="unified-navbar-btn-label">الرئيسية</span>
           </a>
 
-          <a href="${basePath}../Login/login.html" class="unified-navbar-icon-btn" title="الصفحة الرئيسية" aria-label="الصفحة الرئيسية">
+         <a href="${basePath}index.html" class="unified-navbar-icon-btn" title="الصفحة الرئيسية" aria-label="الصفحة الرئيسية">
             <span class="material-symbols-outlined">
-            login
-            </span>   
-            <span class="unified-navbar-btn-label">تسجيل الدخول</span>
+           account_circle
+           </span>
+            <span class="unified-navbar-btn-label"> محمد شدوفة </span>
           </a>
-          
+             
         </div>
       </div>
     `;
-
+     
     return navbar;
   }
 

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f7ff" />
+    <title>MIZAN | إدارة الوظائف</title>
+    <link rel="icon" href="../pic/Mizan Logo 02.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../style/jobs.css" />
+    <link rel="stylesheet" href="../style/modal-system.css" />
+    <script src="../script/unified-navbar.js"></script>
+    <script src="../script/mizan-data.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="../index.html" aria-label="العودة للرئيسية">
+        <img src="../pic/Mizan Logo 02.png" alt="" />
+        <span>ميزان</span>
+      </a>
+      <div class="topbar-actions">
+        <a class="icon-button" href="../index.html" title="الرئيسية" aria-label="الرئيسية">
+          <span class="material-symbols-outlined">home</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="page-heading">
+        <div>
+          <span class="eyebrow">لوحة التحكم / الوظائف</span>
+          <h1>إدارة الوظائف</h1>
+          <p>مصدر مركزي لإدارة المسميات الوظيفية وربطها بالعملاء والموظفين.</p>
+        </div>
+        <div class="heading-actions">
+          <button id="addJobButton" class="primary-button" type="button">
+            <span class="material-symbols-outlined">add</span>
+            إضافة وظيفة
+          </button>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="ملخص الوظائف">
+        <article class="stat-card">
+          <span class="stat-icon blue material-symbols-outlined">work</span>
+          <div>
+            <p>إجمالي الوظائف</p>
+            <strong id="totalJobs">0</strong>
+          </div>
+          <span class="stat-caption">مسمي وظيفي</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon green material-symbols-outlined">check_circle</span>
+          <div>
+            <p>الوظائف المفعلة</p>
+            <strong id="activeJobs">0</strong>
+          </div>
+          <span class="stat-caption">متاحة للاختيار</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon amber material-symbols-outlined">pause_circle</span>
+          <div>
+            <p>الوظائف غير المفعلة</p>
+            <strong id="inactiveJobs">0</strong>
+          </div>
+          <span class="stat-caption">غير متاحة للسجلات الجديدة</span>
+        </article>
+      </section>
+
+      <section class="directory-panel">
+        <div class="directory-heading">
+          <div>
+            <h2>سجل الوظائف</h2>
+            <p>ابحث وفلتر وأدر الوظائف من مصدر مركزي واحد.</p>
+          </div>
+          <span class="live-indicator"><span></span>تحديث مباشر</span>
+        </div>
+
+        <div class="toolbar">
+          <label class="search-box" for="searchInput">
+            <span class="material-symbols-outlined">search</span>
+            <input id="searchInput" type="search" placeholder="ابحث باسم الوظيفة أو الكود..." autocomplete="off" />
+          </label>
+          <label class="select-control">
+            <span class="material-symbols-outlined">filter_list</span>
+            <select id="statusFilter" aria-label="تصفية حسب الحالة">
+              <option value="all">كل الحالات</option>
+              <option value="active">مفعلة</option>
+              <option value="inactive">غير مفعلة</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>كود الوظيفة</th>
+                <th>اسم الوظيفة</th>
+                <th>الحالة</th>
+                <th>تاريخ الإنشاء</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="jobsTable"></tbody>
+          </table>
+        </div>
+
+        <div class="directory-footer">
+          <p id="tableInfo" aria-live="polite">عرض 0 من 0 وظيفة</p>
+          <div class="pagination">
+            <label class="page-size-control">
+              <span>لكل صفحة</span>
+              <select id="pageSize" aria-label="عدد الوظائف في الصفحة">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </label>
+            <button id="previousPage" class="page-button" type="button" aria-label="السابق">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+            <span id="pageIndicator" class="page-indicator">1 / 1</span>
+            <button id="nextPage" class="page-button" type="button" aria-label="التالي">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <a class="back-link" href="../index.html">
+        <span class="material-symbols-outlined">arrow_forward</span>
+        العودة إلى الصفحة الرئيسية
+      </a>
+    </main>
+
+    <div id="jobOverlay" class="modal-overlay mizan-overlay" aria-hidden="true"></div>
+    <section id="jobModal" class="modal mizan-modal" role="dialog" aria-modal="true" aria-labelledby="jobModalTitle" aria-hidden="true">
+      <div class="modal-heading">
+        <div>
+          <span class="eyebrow">بيانات الوظيفة</span>
+          <h2 id="jobModalTitle">إضافة وظيفة جديدة</h2>
+          <p>أدخل اسم الوظيفة ليتم حفظها في المصدر المركزي.</p>
+        </div>
+        <button id="closeModal" class="icon-button close-button" type="button" aria-label="إغلاق">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="jobForm">
+        <div id="formError" class="form-error hidden" role="alert"></div>
+        <label class="form-field">
+          <span>اسم الوظيفة <b>*</b></span>
+          <input id="jobName" name="jobName" type="text" maxlength="120" required placeholder="مثال: محامي" />
+        </label>
+        <label class="form-field" id="jobCodeField">
+          <span>كود الوظيفة</span>
+          <input id="jobCode" name="jobCode" type="text" readonly disabled />
+        </label>
+        <div class="modal-actions">
+          <button id="jobSubmitBtn" class="primary-button" type="submit">حفظ الوظيفة</button>
+          <button id="cancelModal" class="secondary-button" type="button">إلغاء</button>
+        </div>
+      </form>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="../script/jobs.js"></script>
+  </body>
+</html>

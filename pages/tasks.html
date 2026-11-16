@@ -22,6 +22,8 @@
   />
 
   <link rel="stylesheet" href="../style/tasks.css" />
+  <link rel="stylesheet" href="../style/modal-system.css" />
+  <link rel="stylesheet" href="../style/tasks-print.css" />
   <script src="../script/unified-navbar.js"></script>
 </head>
 
@@ -38,8 +40,8 @@
 
       <div class="heading-actions">
         <button id="printTasksBtn" class="print-btn" type="button">
-          <span class="material-symbols-outlined">picture_as_pdf</span>
-          طباعة PDF
+          <span class="material-symbols-outlined">print</span>
+          طباعة التقرير
         </button>
 
         <button id="addTaskBtn" class="primary-btn" type="button">
@@ -185,12 +187,12 @@
   <!-- Add / Edit Task Modal -->
   <div
     id="taskModal"
-    class="modal hidden"
+    class="modal hidden mizan-overlay"
     role="dialog"
     aria-modal="true"
     aria-labelledby="modalTitle"
   >
-    <section class="modal-card">
+    <section class="modal-card mizan-modal">
 
       <header class="modal-header">
         <div>
@@ -324,6 +326,128 @@
 
   <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- =========================================================
+       Official Print Report – generated from the filtered tasks.
+       Visible only in print preview / printed output.
+  ========================================================== -->
+  <section id="printReport" class="print-report" dir="rtl" aria-hidden="true">
+    <header class="print-report__header">
+      <div class="print-report__brand">
+        <img
+          class="print-report__logo"
+          src="../pic/Mizan Logo 02.png"
+          alt="شعار MIZAN"
+        />
+        <div class="print-report__brand-text">
+          <strong>MIZAN</strong>
+          <span>نظام إدارة الموظفين</span>
+        </div>
+      </div>
+
+      <div class="print-report__meta">
+        <div class="print-report__meta-item">
+          <span>تاريخ التقرير</span>
+          <strong id="printGeneratedDate">—</strong>
+        </div>
+        <div class="print-report__meta-item">
+          <span>وقت التقرير</span>
+          <strong id="printGeneratedTime">—</strong>
+        </div>
+        <div class="print-report__meta-item">
+          <span>عدد المهام</span>
+          <strong id="printTasksCount">0</strong>
+        </div>
+      </div>
+
+      <div class="print-report__heading">
+        <span class="print-report__kicker">تقارير الموارد البشرية</span>
+        <h1>تقرير مهام الموظفين</h1>
+        <p>تقرير تفصيلي لمتابعة وتقييم مهام فريق العمل</p>
+      </div>
+    </header>
+
+    <section class="print-summary" aria-label="ملخص إحصائي للمهام">
+      <article class="print-summary__item">
+        <span>إجمالي المهام</span>
+        <strong id="printTotalTasks">0</strong>
+      </article>
+
+      <article class="print-summary__item print-summary__item--done">
+        <span>المهام المنجزة</span>
+        <strong id="printDoneTasks">0</strong>
+      </article>
+
+      <article class="print-summary__item print-summary__item--pending">
+        <span>المهام المتبقية</span>
+        <strong id="printPendingTasks">0</strong>
+      </article>
+
+      <article class="print-summary__item print-summary__item--rate">
+        <span>نسبة الإنجاز</span>
+        <strong id="printCompletionRate">0%</strong>
+      </article>
+    </section>
+
+    <section class="print-table-block">
+      <div class="print-table-block__head">
+        <div>
+          <h2>تفاصيل مهام الموظفين</h2>
+          <p id="printFilterSummary">جميع المهام المسجلة في النظام</p>
+        </div>
+        <span class="print-table-block__badge">سجل رسمي</span>
+      </div>
+
+      <table class="print-tasks-table">
+        <colgroup>
+          <col style="width: 5%" />
+          <col style="width: 10%" />
+          <col style="width: 13%" />
+          <col style="width: 16%" />
+          <col style="width: 9.5%" />
+          <col style="width: 8%" />
+          <col style="width: 10.5%" />
+          <col style="width: 28%" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th>م.</th>
+            <th>كود المهمة</th>
+            <th>اسم الموظف</th>
+            <th>عنوان المهمة</th>
+            <th>تاريخ التنفيذ</th>
+            <th>وقت التنفيذ</th>
+            <th>حالة المهمة</th>
+            <th>تفاصيل المهمة</th>
+          </tr>
+        </thead>
+        <tbody id="printTasksRows"></tbody>
+      </table>
+    </section>
+
+    <footer class="print-report__footer">
+      <div class="print-report__signatures" aria-label="اعتماد التقرير">
+        <div class="print-report__signature">
+          <span>إعداد</span>
+          <i></i>
+        </div>
+        <div class="print-report__signature">
+          <span>مراجعة</span>
+          <i></i>
+        </div>
+        <div class="print-report__signature">
+          <span>اعتماد الإدارة</span>
+          <i></i>
+        </div>
+      </div>
+
+      <div class="print-report__footer-meta">
+        <span>MIZAN — نظام إدارة الموظفين</span>
+        <span id="printFooterDate">—</span>
+        <span class="print-page-number">صفحة</span>
+      </div>
+    </footer>
+  </section>
 
   <script src="../script/tasks.js"></script>
 </body>

@@ -6,6 +6,8 @@ const form = document.getElementById("memberForm");
 const formMessage = document.getElementById("formMessage");
 const passwordInput = document.getElementById("password");
 const togglePassword = document.getElementById("togglePassword");
+const jobPositionSelect = document.getElementById("jobPosition");
+const jobPositionSearch = document.getElementById("jobPositionSearch");
 
 const permissions = [
   "إضافة المستخدم",
@@ -111,10 +113,62 @@ form.addEventListener("submit", (event) => {
     return;
   }
 
+  const member = {
+    id: `member-${Date.now()}`,
+    fullName: document.getElementById("fullName").value.trim(),
+    username: document.getElementById("username").value.trim(),
+    jobPosition: jobPositionSelect ? jobPositionSelect.value : "",
+    permissions: selectedPermissions,
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    const key = "mizan_members";
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    const list = Array.isArray(existing) ? existing : [];
+    list.unshift(member);
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (e) {
+    // non-blocking; form still considered captured
+  }
+
   formMessage.textContent =
-    "تم التحقق من البيانات بنجاح. لحفظ الحساب فعليًا، يلزم ربط النموذج بخادم التطبيق.";
+    "تم حفظ بيانات المستخدم والمسمى الوظيفي بنجاح.";
   formMessage.classList.remove("hidden");
+  form.reset();
+  setAllPermissions(false);
+  if (jobPositionSelect) jobPositionSelect.value = "";
+  if (jobPositionSearch) jobPositionSearch.value = "";
 });
+
+function initJobPositionDropdown() {
+  if (!jobPositionSelect || !window.MizanData) return;
+  window.MizanData.populateJobPositionSelect(jobPositionSelect, {
+    placeholder: "اختر المسمى الوظيفي",
+    includeEmpty: true,
+  });
+
+  if (jobPositionSearch) {
+    jobPositionSearch.addEventListener("input", () => {
+      const q = jobPositionSearch.value.trim().toLocaleLowerCase("ar");
+      const options = Array.from(jobPositionSelect.options);
+      options.forEach((opt, index) => {
+        if (index === 0) {
+          opt.hidden = false;
+          return;
+        }
+        const text = `${opt.textContent || ""} ${opt.value || ""}`.toLocaleLowerCase("ar");
+        opt.hidden = q ? !text.includes(q) : false;
+      });
+      // if current selection hidden, reset to placeholder
+      if (jobPositionSelect.selectedOptions[0]?.hidden) {
+        jobPositionSelect.value = "";
+      }
+    });
+  }
+}
+
+initJobPositionDropdown();
 
 window.addEventListener("load", () => {
   requestAnimationFrame(() => {

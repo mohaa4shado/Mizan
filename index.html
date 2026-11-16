@@ -5,9 +5,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>  MIZAN | لوحة التحكم</title>
-    <link rel="icon" href="pic/MIZAN.jpg" />
+    <link rel="icon" href="pic/Mizan Logo 02.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link rel="icon" href="pic/Mizan Logo 02.png">
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta_Sans:wght@400;500;600;700;800&amp;family=Tajawal:wght@400;500;700;800&amp;display=swap"
       rel="stylesheet"
@@ -17,6 +16,7 @@
       rel="stylesheet"
     />
     <link href="style/style.css" rel="stylesheet" />
+    <link href="style/modal-system.css" rel="stylesheet" />
   </head>
   
   <body class="text-on-background has-skeleton">
@@ -29,11 +29,11 @@
       <div class="pt-12 pb-12 px-8">
         <section class="mb-10">
           <div class="bg-surface-container p-8 rounded-lg">
-            <h4 class="text-xl font-bold mb-6">إجراءات سريعة</h4>
+            <!-- <h4 class="text-xl font-bold mb-6">إجراءات سريعة</h4> -->
             <!-- Container -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
 
-              <!-- الاعضاء -->
+              <!-- العملاء -->
               <a href="pages/clients.html">
                 <div
                   class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all text-center"
@@ -49,7 +49,7 @@
                 </div>
               </a>
 
-              <!-- اضافة عضو -->
+              <!--  المستخدمين -->
               <a href="pages/add_member.html">
                 <div
                   class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all text-center"
@@ -65,7 +65,7 @@
                 </div>
               </a>
 
-              <!-- إضافة الموردين -->
+              <!--  الموردين -->
               <a href="pages/suppliers.html">
                 <div
                 class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all text-center"
@@ -81,7 +81,21 @@
                 </div>
               </a>
 
-              <!-- الوظائف و الموظفين -->
+                 <!-- الوظائف -->
+              <a href="pages/jobs.html">
+                <div
+                  class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all text-center"
+                >
+                  <div
+                    class="w-14 h-14 bg-sky-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4 hover:bg-primary hover:text-white transition-colors"
+                  >
+                  <span class="material-symbols-outlined">work</span>
+                  </div>
+                  <span class="text-sm font-bold block">الوظائف</span>
+                </div>
+              </a>
+
+              <!-- الموظفين -->
               <a href="pages/emb.html">
                 <div
                   class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all text-center"
@@ -90,11 +104,11 @@
                     class="w-14 h-14 bg-sky-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4 hover:bg-primary hover:text-white transition-colors"
                   >
                   <span class="material-symbols-outlined">
-                      work
+                      badge
                       </span>
                     
                   </div>
-                  <span class="text-sm font-bold block">الوظائف و الموظفين</span>
+                  <span class="text-sm font-bold block">الموظفين</span>
                 </div>
               </a>
 
@@ -203,17 +217,21 @@
             مرحباً بك مجدداً !
           </h2>
           <p class="text-on-surface-variant font-medium">
-            إليك نظرة سريعة على أداء منصة أبجدية اليوم.
+        إليك نظرة سريعة على أدائك .
           </p>
         </section>
 
         <!-- Statistics Grid -->
         <section
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
         >
-          <!-- Total Questions Card -->
-          <div
-            class="group relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 duration-300"
+          <!-- Clients Stats Card - 1 -->
+          <a
+            href="pages/clients.html"
+            id="dashboardClientsCard"
+            data-dashboard-card="clients"
+            title="عرض صفحة العملاء"
+            class="group relative block overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 duration-300 cursor-pointer"
           >
             <div
               class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"
@@ -223,26 +241,27 @@
                 <div
                   class="p-3 bg-sky-50 text-primary rounded-xl group-hover:bg-primary group-hover:text-white transition-all duration-300"
                 >
-                  <span
-                    class="material-symbols-outlined text-2xl"
-                    data-icon="quiz"
-                    >quiz</span
-                  >
+                 <span class="material-symbols-outlined text-2xl"
+                      >groups</span
+                    >
                 </div>
                 <div
+                  id="clientsChangeBadge"
                   class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1"
+                  title="نسبة التغير مقارنة بالأسبوع الماضي"
                 >
-                  <span class="material-symbols-outlined text-sm trending-icon"
-                    >trending_up</span
+                  <span id="clientsChangeIcon" class="material-symbols-outlined text-sm trending-icon"
+                    >trending_flat</span
                   >
-                  0%
+                  <span id="clientsChangePercent">0%</span>
                 </div>
               </div>
               <div class="mb-6">
                 <p class="text-on-surface-variant text-sm font-bold mb-1">
-                  #
+                 إجمالي العملاء
                 </p>
                 <h3
+                  id="clientsTotal"
                   class="text-3xl font-black text-on-background tracking-tight"
                 >
                   0
@@ -257,7 +276,7 @@
                   <span class="text-slate-400 font-medium text-[10px]"
                     >هذا الأسبوع</span
                   >
-                  <span class="text-primary font-bold">0</span>
+                  <span id="clientsThisWeek" class="text-primary font-bold">0</span>
                 </div>
                 <div class="w-px h-6 bg-sky-100"></div>
                 <div
@@ -266,15 +285,19 @@
                   <span class="text-slate-400 font-medium text-[10px]"
                     >الأسبوع الماضي</span
                   >
-                  <span class="text-slate-500 font-bold">0</span>
+                  <span id="clientsLastWeek" class="text-slate-500 font-bold">0</span>
                 </div>
               </div>
             </div>
-          </div>
+          </a>
 
-          <!-- Viewed Questions Card -->
-          <div
-            class="group relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-secondary/5 hover:-translate-y-1 duration-300"
+          <!-- Cases Stats Card - 2 -->
+          <a
+            href="pages/court.html"
+            id="dashboardCasesCard"
+            data-dashboard-card="cases"
+            title="عرض صفحة القضايا"
+            class="group relative block overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-secondary/5 hover:-translate-y-1 duration-300 cursor-pointer"
           >
             <div
               class="absolute -right-4 -top-4 w-24 h-24 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-colors"
@@ -287,31 +310,31 @@
                 <div
                   class="p-3 bg-amber-50 text-secondary rounded-xl group-hover:bg-secondary transition-all duration-300 hover:scale-110"
                 >
-                  <span
-                    class="material-symbols-outlined text-2xl group-hover:text-white transition-colors duration-300"
-                  >
-                    visibility
-                  </span>
+               <span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors duration-300">balance</span>
+
                 </div>
 
                 <!-- Trending -->
                 <div
+                  id="casesChangeBadge"
                   class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1"
+                  title="نسبة التغير مقارنة بالأسبوع الماضي"
                 >
-                  <span class="material-symbols-outlined text-sm">
-                    trending_up
+                  <span id="casesChangeIcon" class="material-symbols-outlined text-sm">
+                    trending_flat
                   </span>
-                  0%
+                  <span id="casesChangePercent">0%</span>
                 </div>
               </div>
 
               <!-- Content -->
               <div class="mb-6">
                 <p class="text-on-surface-variant text-sm font-bold mb-1">
-                  #
+                  إجمالي القضايا
                 </p>
 
                 <h3
+                  id="casesTotalCount"
                   class="text-3xl font-black text-on-background tracking-tight"
                 >
                   0
@@ -330,7 +353,7 @@
                     هذا الأسبوع
                   </span>
 
-                  <span class="text-secondary font-bold"> 0 </span>
+                  <span id="casesThisWeek" class="text-secondary font-bold"> 0 </span>
                 </div>
 
                 <!-- Divider -->
@@ -344,14 +367,19 @@
                     الأسبوع الماضي
                   </span>
 
-                  <span class="text-slate-500 font-bold"> 0 </span>
+                  <span id="casesPrevWeek" class="text-slate-500 font-bold"> 0 </span>
                 </div>
               </div>
             </div>
-          </div>
-          <!-- Reviewed Questions Card -->
-          <div
-            class="group relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-tertiary/5 hover:-translate-y-1 duration-300"
+          </a>
+
+          <!-- Sessions Stats Card - 3 -->
+          <a
+            href="pages/sessions.html"
+            id="dashboardSessionsCard"
+            data-dashboard-card="sessions"
+            title="عرض صفحة الجلسات"
+            class="group relative block overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-tertiary/5 hover:-translate-y-1 duration-300 cursor-pointer"
           >
             <div
               class="absolute -right-4 -top-4 w-24 h-24 bg-tertiary/5 rounded-full blur-2xl group-hover:bg-tertiary/10 transition-colors"
@@ -361,26 +389,27 @@
                 <div
                   class="p-3 bg-emerald-50 text-tertiary rounded-xl group-hover:bg-tertiary group-hover:text-white transition-all duration-300"
                 >
-                  <span
-                    class="material-symbols-outlined text-2xl"
-                    data-icon="rate_review"
-                    >rate_review</span
-                  >
+                   <span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors duration-300">
+                    display_group
+                    </span>
                 </div>
                 <div
+                  id="sessionsChangeBadge"
                   class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1"
+                  title="نسبة التغير مقارنة بالأسبوع الماضي"
                 >
-                  <span class="material-symbols-outlined text-sm"
-                    >trending_up</span
+                  <span id="sessionsChangeIcon" class="material-symbols-outlined text-sm"
+                    >trending_flat</span
                   >
-                  0%
+                  <span id="sessionsChangePercent">0%</span>
                 </div>
               </div>
               <div class="mb-6">
                 <p class="text-on-surface-variant text-sm font-bold mb-1">
-                  #
+                  إجمالي الجلسات
                 </p>
                 <h3
+                  id="sessionsTotalCount"
                   class="text-3xl font-black text-on-background tracking-tight"
                 >
                   0
@@ -395,7 +424,7 @@
                   <span class="text-slate-400 font-medium text-[10px]"
                     >هذا الأسبوع</span
                   >
-                  <span class="text-tertiary font-bold">0</span>
+                  <span id="sessionsThisWeek" class="text-tertiary font-bold">0</span>
                 </div>
                 <div class="w-px h-6 bg-sky-100"></div>
                 <div
@@ -404,75 +433,16 @@
                   <span class="text-slate-400 font-medium text-[10px]"
                     >الأسبوع الماضي</span
                   >
-                  <span class="text-slate-500 font-bold">0</span>
+                  <span id="sessionsPrevWeek" class="text-slate-500 font-bold">0</span>
                 </div>
               </div>
             </div>
-          </div>
+          </a>
 
-          <!-- Approved Questions Card -->
-          <div
-            class="group relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-primary-fixed-dim/5 hover:-translate-y-1 duration-300"
-          >
-            <div
-              class="absolute -right-4 -top-4 w-24 h-24 bg-primary-fixed-dim/5 rounded-full blur-2xl group-hover:bg-primary-fixed-dim/10 transition-colors"
-            ></div>
-            <div class="relative z-10 flex flex-col h-full">
-              <div class="flex justify-between items-start mb-6">
-                <div
-                  class="p-3 bg-blue-50 text-primary-dim rounded-xl group-hover:bg-primary-dim group-hover:text-white transition-all duration-300"
-                >
-                  <span
-                    class="material-symbols-outlined text-2xl"
-                    data-icon="verified"
-                    >verified</span
-                  >
-                </div>
-                <div
-                  class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1"
-                >
-                  <span class="material-symbols-outlined text-sm"
-                    >trending_up</span
-                  >
-                  0%
-                </div>
-              </div>
-              <div class="mb-6">
-                <p class="text-on-surface-variant text-sm font-bold mb-1">
-                    #
-                </p>
-                <h3
-                  class="text-3xl font-black text-on-background tracking-tight"
-                >
-                  0
-                </h3>
-              </div>
-              <div
-                class="mt-auto pt-4 border-t border-dashed border-sky-100 flex items-center justify-between text-xs"
-              >
-                <div
-                  class="flex flex-col items-center justify-center bg-sky-100/50 w-24 h-14 rounded-md"
-                >
-                  <span class="text-slate-400 font-medium text-[10px]"
-                    >هذا الأسبوع</span
-                  >
-                  <span class="text-primary-dim font-bold">0</span>
-                </div>
-                <div class="w-px h-6 bg-sky-100"></div>
-                <div
-                  class="flex flex-col items-center justify-center bg-orange-50 w-24 h-14 rounded-md"
-                >
-                  <span class="text-slate-400 font-medium text-[10px]"
-                    >الأسبوع الماضي</span
-                  >
-                  <span class="text-slate-500 font-bold">0</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          
+          <!-- Explained Questions Card - 4 -->
 
-          <!-- Explained Questions Card -->
-          <div
+          <!-- <div
             class="group relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-sky-100/50 transition-all hover:shadow-xl hover:shadow-primary-container/5 hover:-translate-y-1 duration-300"
           >
             <div
@@ -483,11 +453,9 @@
                 <div
                   class="p-3 bg-sky-50 text-primary-fixed-dim rounded-xl group-hover:bg-primary-fixed-dim group-hover:text-white transition-all duration-300"
                 >
-                  <span
-                    class="material-symbols-outlined text-2xl"
-                    data-icon="smart_display"
-                    >smart_display</span
-                  >
+                   <span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors duration-300">
+                    payments
+                    </span>
                 </div>
                 <div
                   class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1"
@@ -500,7 +468,7 @@
               </div>
               <div class="mb-6">
                 <p class="text-on-surface-variant text-sm font-bold mb-1">
-                   #
+                  إجمالي الأرباح
                 </p>
                 <h3
                   class="text-3xl font-black text-on-background tracking-tight"
@@ -531,14 +499,14 @@
               </div>
             </div>
           </div>
-        </section>
+        </section> -->
 
       
 
     <!-- Notifications Overlay + Popup -->
     <div
       id="overlay"
-      class="fixed inset-0 z-50 hidden opacity-0 transition-opacity bg-black/20 backdrop-blur-sm"
+      class="fixed inset-0 z-50 hidden opacity-0 transition-opacity bg-black/20 backdrop-blur-sm mizan-overlay"
       aria-hidden="true"
     ></div>
 
@@ -550,10 +518,10 @@
       aria-labelledby="modalTitle"
     >
       <div
-        class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-sky-100/60 overflow-hidden"
+        class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-sky-100/60 overflow-hidden mizan-modal mizan-modal--sm"
       >
         <div
-          class="flex items-center justify-between p-5 border-b border-sky-100/60"
+          class="modal-head flex items-center justify-between p-5 border-b border-sky-100/60"
         >
           <h3 id="modalTitle" class="text-lg font-bold text-on-background">
             الإشعارات
@@ -568,20 +536,22 @@
           </button>
         </div>
 
-        <div id="modalContent" class="p-5 text-sm text-on-background">
+        <div id="modalContent" class="notification-content p-5 text-sm text-on-background">
           <!-- محتوى الإشعارات سيتم حقنه بواسطة script.js -->
         </div>
       </div>
     </div>
 
+
+
     <!-- FAB Action -->
-    <button
+    <!-- <button
       class="fixed bottom-8 left-8 bg-gradient-to-br from-primary to-primary-container text-white w-16 h-16 rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50"
     >
       <span class="material-symbols-outlined text-3xl fill-0" data-icon="add"
         >add</span
       >
-    </button>
+    </button> -->
 
     <!-- Scripts -->
     <script src="script/script.js"></script>

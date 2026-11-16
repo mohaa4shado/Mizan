@@ -693,27 +693,149 @@ $("#tasksRows").addEventListener("click", (event) => {
 });
 
 /* ========================================
-   Print Tasks as PDF
+   Print Report
 ======================================== */
 
-let previousPageSize = null;
+const padNumber = (value) => String(value).padStart(2, "0");
+
+const formatReportDate = (date = new Date()) =>
+  `${padNumber(date.getDate())}/${padNumber(date.getMonth() + 1)}/${date.getFullYear()}`;
+
+const formatReportTime = (date = new Date()) => {
+  const hours = date.getHours();
+  const minutes = padNumber(date.getMinutes());
+  const period = hours >= 12 ? "م" : "ص";
+
+  return `${padNumber(hours % 12 || 12)}:${minutes} ${period}`;
+};
+
+const formatTaskCode = (task) => {
+  const raw = String(task.id ?? "").replace(/\D/g, "");
+
+  if (!raw) return "—";
+
+  return `TSK-${raw.slice(-6).padStart(6, "0")}`;
+};
+
+const formatPrintTime = (value) => {
+  if (!value) return "—";
+
+  const [h, m] = value.split(":").map(Number);
+
+  return `${String(h % 12 || 12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${
+    h >= 12 ? "م" : "ص"
+  }`;
+};
+
+function getPrintFilterSummary() {
+  const query = $("#searchInput").value.trim();
+  const status = $("#statusFilter").value;
+  const selectedDate = $("#dateFilter").value;
+  const parts = [];
+
+  if (query) parts.push(`البحث: ${query}`);
+
+  if (status !== "all") {
+    parts.push(
+      `الحالة: ${
+        status === "done" ? "تم الإنجاز" : "قيد التنفيذ / متبقية"
+      }`
+    );
+  }
+
+  if (selectedDate) parts.push(`التاريخ: ${formatDate(selectedDate)}`);
+
+  return parts.length
+    ? `نتائج التصفية الحالية — ${parts.join(" • ")}`
+    : "جميع المهام المسجلة في النظام";
+}
+
+function renderPrintReport(records) {
+  const total = records.length;
+
+  const done = records.filter(
+    (task) => task.taskStatus === "done"
+  ).length;
+
+  const pending = total - done;
+
+  const rate = total ? Math.round((done / total) * 100) : 0;
+
+  const now = new Date();
+  const reportDate = formatReportDate(now);
+  const reportTime = formatReportTime(now);
+
+  $("#printGeneratedDate").textContent = reportDate;
+  $("#printGeneratedTime").textContent = reportTime;
+  $("#printTasksCount").textContent = total;
+
+  $("#printTotalTasks").textContent = total;
+  $("#printDoneTasks").textContent = done;
+  $("#printPendingTasks").textContent = pending;
+  $("#printCompletionRate").textContent = `${rate}%`;
+
+  $("#printFilterSummary").textContent = getPrintFilterSummary();
+  $("#printFooterDate").textContent =
+    `تاريخ الطباعة: ${reportDate} — ${reportTime}`;
+
+  $("#printTasksRows").innerHTML = total
+    ? records
+        .map(
+          (task, index) => `
+            <tr>
+              <td class="cell-index">${index + 1}</td>
+              <td class="cell-code">${esc(formatTaskCode(task))}</td>
+              <td class="cell-employee">${esc(task.employeeName)}</td>
+              <td class="cell-title">${esc(task.taskTitle)}</td>
+              <td class="cell-date">${formatDate(task.taskDate)}</td>
+              <td class="cell-time">${formatPrintTime(task.taskTime)}</td>
+              <td class="cell-status">
+                <span class="print-status ${
+                  task.taskStatus === "done"
+                    ? "print-status--done"
+                    : "print-status--pending"
+                }">
+                  ${task.taskStatus === "done" ? "منجزة" : "متبقية"}
+                </span>
+              </td>
+              <td class="cell-details">${esc(task.taskDetails)}</td>
+            </tr>
+          `
+        )
+        .join("")
+    : `
+        <tr>
+          <td colspan="8">
+            <div class="print-empty">
+              لا توجد مهام مطابقة للتصفية الحالية.
+            </div>
+          </td>
+        </tr>
+      `;
+
+  $("#printReport").setAttribute("aria-hidden", "false");
+}
+
+/* ========================================
+   Print Tasks Report
+======================================== */
+
+let printReportTimer;
 
 $("#printTasksBtn").addEventListener("click", () => {
+  // Print every record that matches the active filters,
+  // not just the records visible on the current page.
+  const records = getFilteredTasks();
 
-  // Prevent Repeated Print Requests
-  if (previousPageSize !== null) return;
+  renderPrintReport(records);
 
-  // Save Current Page Size
-  previousPageSize = $("#pageSize").value;
+  document.body.classList.add("print-mode");
 
-  // Show All Filtered Results Before Printing
-  $("#pageSize").value = "all";
+  clearTimeout(printReportTimer);
 
-  draw();
-
-  // Open Browser Print Dialog
-  window.print();
-
+  printReportTimer = setTimeout(() => {
+    window.print();
+  }, 120);
 });
 
 /* ========================================
@@ -721,15 +843,8 @@ $("#printTasksBtn").addEventListener("click", () => {
 ======================================== */
 
 window.addEventListener("afterprint", () => {
-
-  if (previousPageSize === null) return;
-
-  $("#pageSize").value = previousPageSize;
-
-  previousPageSize = null;
-
-  draw();
-
+  document.body.classList.remove("print-mode");
+  $("#printReport").setAttribute("aria-hidden", "true");
 });
 
 /* ========================================

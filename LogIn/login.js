@@ -332,9 +332,25 @@ const forgotPassword = $("forgotPassword");
 const closeModalButton = $("closeModal");
 const resetForm = $("resetForm");
 
+function lockPageScroll() {
+  const scrollbarWidth =
+    window.innerWidth - document.documentElement.clientWidth;
+
+  document.body.style.overflow = "hidden";
+  document.body.style.paddingLeft =
+    scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+}
+
+function unlockPageScroll() {
+  document.body.style.overflow = "";
+  document.body.style.paddingLeft = "";
+}
+
 function openModal() {
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+
+  lockPageScroll();
 
   setTimeout(() => {
     $("email").focus();
@@ -344,6 +360,8 @@ function openModal() {
 function closeModal() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
+
+  unlockPageScroll();
 
   forgotPassword.focus();
 }

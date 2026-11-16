@@ -160,13 +160,19 @@ function escapeHTML(value) {
   });
 }
 
+// ==========================================
+// Phone Number Handling
+// ==========================================
+
+// لا يوجد تحقق من رقم الهاتف أو عدد أرقامه.
+// يتم الاحتفاظ بالقيمة كما أدخلها المستخدم.
 function normalizePhone(value) {
-  return String(value ?? "").replace(/\D/g, "");
+  return String(value ?? "").trim();
 }
 
-function isValidEgyptianPhone(value) {
-  return /^01\d{9}$/.test(normalizePhone(value));
-}
+// ==========================================
+// Date
+// ==========================================
 
 function getLocalDate() {
   const now = new Date();
@@ -177,6 +183,10 @@ function getLocalDate() {
 
   return `${year}-${month}-${day}`;
 }
+
+// ==========================================
+// IDs & Serial Numbers
+// ==========================================
 
 function createId() {
   if (globalThis.crypto?.randomUUID) {
@@ -190,7 +200,9 @@ function getNextSerial() {
   const maxSerial = cases.reduce((max, item) => {
     const serial = Number(item.serial);
 
-    return Number.isFinite(serial) ? Math.max(max, serial) : max;
+    return Number.isFinite(serial)
+      ? Math.max(max, serial)
+      : max;
   }, 110);
 
   return String(maxSerial + 1);
@@ -201,13 +213,16 @@ function getNextSerial() {
 // ==========================================
 
 function normalizeCase(item, index = 0) {
-  const safeItem = item && typeof item === "object" ? item : {};
+  const safeItem =
+    item && typeof item === "object" ? item : {};
 
   return {
     id: String(safeItem.id || createId()),
     clientName: String(safeItem.clientName || ""),
     clientRole: String(safeItem.clientRole || ""),
+
     clientPhone: normalizePhone(safeItem.clientPhone),
+
     registrationDate: String(safeItem.registrationDate || ""),
     serial: String(safeItem.serial || index + 111),
     caseYear: String(safeItem.caseYear || ""),
@@ -217,6 +232,7 @@ function normalizeCase(item, index = 0) {
     circuit: String(safeItem.circuit || ""),
     subject: String(safeItem.subject || ""),
     lawyer: String(safeItem.lawyer || ""),
+
     status: [
       "قيد المتابعة",
       "تحتاج متابعة",
@@ -224,8 +240,11 @@ function normalizeCase(item, index = 0) {
     ].includes(safeItem.status)
       ? safeItem.status
       : "قيد المتابعة",
+
     opponentName: String(safeItem.opponentName || ""),
+
     opponentPhone: normalizePhone(safeItem.opponentPhone),
+
     notes: String(safeItem.notes || ""),
   };
 }
@@ -234,7 +253,6 @@ function loadCases() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
 
-    // First visit: initialize sample data.
     if (raw === null) {
       const initialCases = seeds.map((item) => ({ ...item }));
 
@@ -676,37 +694,18 @@ function closeModal() {
 }
 
 // ==========================================
-// Add & Edit Cases
+// Validate Case
 // ==========================================
 
 function validateCase(values) {
-  if (!isValidEgyptianPhone(values.clientPhone)) {
-    toast(
-      "رقم هاتف العميل غير صحيح. يجب أن يبدأ بـ 01 ويتكون من 11 رقماً.",
-      true
-    );
+  // لا يوجد أي شرط للتحقق من رقم هاتف العميل أو الخصم.
 
-    form.elements.clientPhone.focus();
-
-    return false;
-  }
-
-  if (
-    values.opponentPhone &&
-    !isValidEgyptianPhone(values.opponentPhone)
-  ) {
-    toast(
-      "رقم هاتف الخصم غير صحيح. يجب أن يبدأ بـ 01 ويتكون من 11 رقماً.",
-      true
-    );
-
-    form.elements.opponentPhone.focus();
-
-    return false;
-  }
-
+  // Validate case year only.
   if (!/^\d{4}$/.test(values.caseYear)) {
-    toast("يرجى إدخال سنة قضية صحيحة مكونة من 4 أرقام.", true);
+    toast(
+      "يرجى إدخال سنة قضية صحيحة مكونة من 4 أرقام.",
+      true
+    );
 
     form.elements.caseYear.focus();
 
@@ -716,19 +715,26 @@ function validateCase(values) {
   return true;
 }
 
+// ==========================================
+// Add & Edit Cases
+// ==========================================
+
 function handleSubmit(event) {
   event.preventDefault();
 
+  // Run browser validation.
   if (!form.reportValidity()) return;
 
+  // Collect form values.
   const values = Object.fromEntries(
     new FormData(form).entries()
   );
 
+  // Keep phone values exactly as entered.
   values.clientPhone = normalizePhone(values.clientPhone);
-
   values.opponentPhone = normalizePhone(values.opponentPhone);
 
+  // Custom validation.
   if (!validateCase(values)) return;
 
   const existing = cases.find(
@@ -817,46 +823,59 @@ function handleAction(event) {
 // Event Listeners
 // ==========================================
 
+// Open modal.
 openModalButton.addEventListener("click", () => {
   openModal();
 });
 
+// Close modal.
 closeModalButton.addEventListener("click", closeModal);
 
 cancelModalButton.addEventListener("click", closeModal);
 
 overlay.addEventListener("click", closeModal);
 
+// Form submit.
 form.addEventListener("submit", handleSubmit);
 
+// Table and cards actions.
 table.addEventListener("click", handleAction);
 
 cards.addEventListener("click", handleAction);
 
-// Search and filters.
+// ==========================================
+// Search & Filters
+// ==========================================
 
 searchInput.addEventListener("input", () => {
   currentPage = 1;
+
   render();
 });
 
 statusFilter.addEventListener("change", () => {
   currentPage = 1;
+
   render();
 });
 
 typeFilter.addEventListener("change", () => {
   currentPage = 1;
+
   render();
 });
 
 pageSizeSelect.addEventListener("change", () => {
   currentPage = 1;
+
   render();
 });
 
-// Previous page.
+// ==========================================
+// Pagination
+// ==========================================
 
+// Previous page.
 previousPageButton.addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
@@ -866,7 +885,6 @@ previousPageButton.addEventListener("click", () => {
 });
 
 // Next page.
-
 nextPageButton.addEventListener("click", () => {
   const totalPages = Math.max(
     1,
@@ -883,13 +901,17 @@ nextPageButton.addEventListener("click", () => {
   }
 });
 
-// Print.
+// ==========================================
+// Print
+// ==========================================
 
 printButton.addEventListener("click", () => {
   window.print();
 });
 
-// Keyboard shortcuts.
+// ==========================================
+// Keyboard Shortcuts
+// ==========================================
 
 document.addEventListener("keydown", (event) => {
   if (
@@ -951,7 +973,10 @@ window.addEventListener("storage", (event) => {
 
     render();
   } catch (error) {
-    console.error("Storage synchronization error:", error);
+    console.error(
+      "Storage synchronization error:",
+      error
+    );
 
     toast("حدث خطأ أثناء تحديث البيانات.", true);
   }

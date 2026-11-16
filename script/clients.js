@@ -1,545 +1,1187 @@
-const STORAGE_KEY = "members";
-const DEFAULT_IMAGE = "../pic/images.png";
-const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
-const PAGE_SIZE_DEFAULT = 6;
 
-const membersTable = document.getElementById("membersTable");
-const membersCards = document.getElementById("membersCards");
-const searchInput = document.getElementById("searchInput");
-const statusFilter = document.getElementById("statusFilter");
-const sortFilter = document.getElementById("sortFilter");
-const pageSizeSelect = document.getElementById("pageSize");
-const totalUsers = document.getElementById("totalUsers");
-const activeUsers = document.getElementById("activeUsers");
-const inactiveUsers = document.getElementById("inactiveUsers");
-const resultsSummary = document.getElementById("resultsSummary");
-const pageIndicator = document.getElementById("pageIndicator");
-const previousPageButton = document.getElementById("previousPage");
-const nextPageButton = document.getElementById("nextPage");
-const overlay = document.getElementById("clientOverlay");
-const modal = document.getElementById("clientModal");
-const memberForm = document.getElementById("memberForm");
-const imageInput = document.getElementById("image");
-const imagePreview = document.getElementById("imagePreview");
-const formTitle = document.getElementById("memberModalTitle");
-const submitButton = document.getElementById("memberSubmitBtn");
-const activeField = document.getElementById("activeField");
-const activeCheckbox = document.getElementById("clientActive");
+"use strict";
 
-let editingMemberId = null;
-let currentPage = 1;
-let members = [];
+/* =========================================================
+   MIZAN - CLIENT MANAGEMENT
+   إضافة / تعديل / حذف / بحث / فلترة / حفظ العملاء
+========================================================= */
 
-function showToast(message, type = "success") {
-  const toast = document.createElement("div");
-  toast.className = `toast ${type === "error" ? "toast-error" : "toast-success"}`;
-  toast.setAttribute("role", "status");
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  window.setTimeout(() => toast.remove(), 3200);
-}
+document.addEventListener("DOMContentLoaded", () => {
+  /* =========================
+     1. SETTINGS
+  ========================= */
 
-function createId() {
-  return (
-    globalThis.crypto?.randomUUID?.() ??
-    `client-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
-  );
-}
+  const STORAGE_KEY = "members";
+  const DEFAULT_PAGE_SIZE = 6;
+  const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
-function safeImageSource(value) {
-  if (typeof value !== "string") return DEFAULT_IMAGE;
-  if (/^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(value)) return value;
-  if (/^https:\/\/[^\s"'<>]+$/i.test(value)) return value;
-  if (/^\.\.\/pic\/[a-z0-9._-]+$/i.test(value)) return value;
-  return DEFAULT_IMAGE;
-}
+  let members = [];
+  let currentPage = 1;
+  let pageSize = DEFAULT_PAGE_SIZE;
+  let editingMemberId = null;
+  let selectedImage = "";
 
-function normalizeMember(member) {
-  const record = member && typeof member === "object" ? member : {};
-  return {
-    id: typeof record.id === "string" && record.id ? record.id : createId(),
-    name: typeof record.name === "string" ? record.name : "",
-    occupation:
-      typeof record.occupation === "string"
-        ? record.occupation
-        : typeof record.job === "string"
-          ? record.job
-          : "",
-    mobile:
-      typeof record.mobile === "string" || typeof record.mobile === "number"
-        ? String(record.mobile)
-        : "",
-    nationalId:
-      typeof record.nationalId === "string" ||
-      typeof record.nationalId === "number"
-        ? String(record.nationalId)
-        : "",
-    nationality:
-      typeof record.nationality === "string" ? record.nationality : "",
-    address: typeof record.address === "string" ? record.address : "",
-    image: safeImageSource(record.image),
-    active: record.active === undefined ? true : Boolean(record.active),
-    createdAt: typeof record.createdAt === "string" ? record.createdAt : "",
+  /* =========================
+     2. DOM ELEMENTS
+  ========================= */
+
+  const elements = {
+    addButton: document.getElementById("addClientButton"),
+
+    totalUsers: document.getElementById("totalUsers"),
+    activeUsers: document.getElementById("activeUsers"),
+    inactiveUsers: document.getElementById("inactiveUsers"),
+
+    membersTable: document.getElementById("membersTable"),
+    membersCards: document.getElementById("membersCards"),
+
+    searchInput: document.getElementById("searchInput"),
+    statusFilter: document.getElementById("statusFilter"),
+    sortFilter: document.getElementById("sortFilter"),
+    pageSize: document.getElementById("pageSize"),
+
+    resultsSummary: document.getElementById("resultsSummary"),
+    previousPage: document.getElementById("previousPage"),
+    nextPage: document.getElementById("nextPage"),
+    pageIndicator: document.getElementById("pageIndicator"),
+
+    overlay: document.getElementById("clientOverlay"),
+    modal: document.getElementById("clientModal"),
+    closeModal: document.getElementById("closeClientModal"),
+    cancelModal: document.getElementById("cancelClientModal"),
+
+    form: document.getElementById("memberForm"),
+    formTitle: document.getElementById("memberModalTitle"),
+    submitButton: document.getElementById("memberSubmitBtn"),
+
+    name: document.getElementById("name"),
+    jobId: document.getElementById("jobId"),
+    mobile: document.getElementById("mobile"),
+    nationalId: document.getElementById("nationalId"),
+    nationality: document.getElementById("nationality"),
+    address: document.getElementById("address"),
+
+    imageInput: document.getElementById("image"),
+    imagePreview: document.getElementById("imagePreview"),
+
+    activeField: document.getElementById("activeField"),
+    clientActive: document.getElementById("clientActive"),
   };
-}
 
-function loadMembers() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return [];
+  /* =========================
+     3. CHECK REQUIRED ELEMENTS
+  ========================= */
 
-    const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed)) {
-      console.error(`Invalid data found in localStorage key "${STORAGE_KEY}".`);
-      showToast("تعذر قراءة بيانات العملاء المخزنة.", "error");
-      return [];
+  const requiredElements = [
+    "addButton",
+    "membersTable",
+    "searchInput",
+    "statusFilter",
+    "sortFilter",
+    "form",
+    "overlay",
+    "modal",
+    "submitButton",
+    "name",
+    "jobId",
+    "mobile",
+    "nationalId",
+    "nationality",
+  ];
+
+  const missingElements = requiredElements.filter(
+    (key) => !elements[key]
+  );
+
+  if (missingElements.length) {
+    console.error(
+      "MIZAN: Missing HTML elements:",
+      missingElements
+    );
+
+    return;
+  }
+
+  /* =========================
+     4. HELPERS
+  ========================= */
+
+  function generateId() {
+    if (window.crypto?.randomUUID) {
+      return window.crypto.randomUUID();
     }
-    return parsed.map(normalizeMember);
-  } catch (error) {
-    console.error("Failed to load client data from localStorage.", error);
-    showToast("تعذر قراءة بيانات العملاء من التخزين المحلي.", "error");
-    return [];
-  }
-}
 
-function saveMembers(nextMembers) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextMembers));
-    return true;
-  } catch (error) {
-    console.error("Failed to save client data to localStorage.", error);
-    showToast("تعذر حفظ البيانات. تحقق من مساحة التخزين المتاحة.", "error");
-    return false;
+    return `${Date.now()}-${Math.random()
+      .toString(16)
+      .slice(2)}`;
   }
-}
 
-function escapeHTML(value) {
-  return String(value ?? "").replace(
-    /[&<>"']/g,
-    (character) =>
-      ({
+  function escapeHTML(value = "") {
+    return String(value).replace(/[&<>"']/g, (character) => {
+      const entities = {
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
-        "'": "&#39;",
-      })[character],
-  );
-}
+        "'": "&#039;",
+      };
 
-function statusBadge(member) {
-  const statusText = member.active ? "نشط" : "غير نشط";
-  const statusClass = member.active ? "is-active" : "is-inactive";
-  return `<span class="status-badge ${statusClass}"><span></span>${statusText}</span>`;
-}
-
-function actionButtons(member) {
-  const escapedId = escapeHTML(member.id);
-  return `
-    <div class="row-actions">
-      <button class="action-button edit-action" type="button" data-action="edit" data-id="${escapedId}" aria-label="تعديل ${escapeHTML(member.name)}" title="تعديل">
-        <span class="material-symbols-outlined" aria-hidden="true">edit</span>
-      </button>
-      <button class="action-button status-action" type="button" data-action="toggle" data-id="${escapedId}" aria-label="${member.active ? "تعطيل" : "تنشيط"} ${escapeHTML(member.name)}" title="${member.active ? "تعطيل العميل" : "تنشيط العميل"}">
-        <span class="material-symbols-outlined" aria-hidden="true">${member.active ? "person_off" : "person_check"}</span>
-      </button>
-      <button class="action-button delete-action" type="button" data-action="delete" data-id="${escapedId}" aria-label="حذف ${escapeHTML(member.name)}" title="حذف">
-        <span class="material-symbols-outlined" aria-hidden="true">delete</span>
-      </button>
-    </div>
-  `;
-}
-
-function emptyMarkup() {
-  const hasFilters =
-    Boolean(searchInput.value.trim()) || statusFilter.value !== "all";
-  return `
-    <div class="empty-state">
-      <span class="material-symbols-outlined" aria-hidden="true">${hasFilters ? "search_off" : "group_add"}</span>
-      <h3>${hasFilters ? "لا توجد نتائج مطابقة" : "لا يوجد عملاء بعد"}</h3>
-      <p>${hasFilters ? "جرّب تغيير كلمات البحث أو خيارات التصفية." : "ابدأ بإضافة أول عميل إلى قائمتك."}</p>
-    </div>
-  `;
-}
-
-function renderTable(data) {
-  if (!membersTable) return;
-  if (data.length === 0) {
-    membersTable.innerHTML = `<tr><td colspan="7">${emptyMarkup()}</td></tr>`;
-    return;
-  }
-
-  membersTable.innerHTML = data
-    .map(
-      (member) => `
-    <tr>
-      <td>
-        <div class="client-cell">
-          <img class="client-avatar" src="${escapeHTML(member.image)}" alt="" />
-          <div class="client-name">
-            <strong>${escapeHTML(member.name)}</strong>
-            <span>${escapeHTML(member.address || "العنوان غير مسجل")}</span>
-          </div>
-        </div>
-      </td>
-      <td>${escapeHTML(member.occupation || "—")}</td>
-      <td class="number-cell" dir="ltr">${escapeHTML(member.mobile || "—")}</td>
-      <td class="number-cell" dir="ltr">${escapeHTML(member.nationalId || "—")}</td>
-      <td>${escapeHTML(member.nationality || "—")}</td>
-      <td>${statusBadge(member)}</td>
-      <td>${actionButtons(member)}</td>
-    </tr>
-  `,
-    )
-    .join("");
-}
-
-function renderCards(data) {
-  if (!membersCards) return;
-  if (data.length === 0) {
-    membersCards.innerHTML = emptyMarkup();
-    return;
-  }
-
-  membersCards.innerHTML = data
-    .map(
-      (member) => `
-    <article class="client-card">
-      <div class="client-card-heading">
-        <div class="client-cell">
-          <img class="client-avatar" src="${escapeHTML(member.image)}" alt="" />
-          <div class="client-name">
-            <strong>${escapeHTML(member.name)}</strong>
-            <span>${escapeHTML(member.occupation || "الوظيفة غير مسجلة")}</span>
-          </div>
-        </div>
-        ${statusBadge(member)}
-      </div>
-      <dl class="client-details">
-        <div><dt>رقم الهاتف</dt><dd dir="ltr">${escapeHTML(member.mobile || "—")}</dd></div>
-        <div><dt>الرقم القومي</dt><dd dir="ltr">${escapeHTML(member.nationalId || "—")}</dd></div>
-        <div><dt>الجنسية</dt><dd>${escapeHTML(member.nationality || "—")}</dd></div>
-        <div><dt>العنوان</dt><dd>${escapeHTML(member.address || "غير مسجل")}</dd></div>
-      </dl>
-      <div class="client-card-footer">${actionButtons(member)}</div>
-    </article>
-  `,
-    )
-    .join("");
-}
-
-function getFilteredMembers() {
-  const searchTerm = searchInput.value.trim().toLocaleLowerCase("ar");
-  const status = statusFilter.value;
-  const sorted = members.filter((member) => {
-    const matchesStatus =
-      status === "all" ||
-      (status === "active" && member.active) ||
-      (status === "inactive" && !member.active);
-    const searchableValues = [
-      member.name,
-      member.occupation,
-      member.mobile,
-      member.nationalId,
-      member.nationality,
-      member.address,
-    ];
-    const matchesSearch =
-      !searchTerm ||
-      searchableValues.some((value) =>
-        value.toLocaleLowerCase("ar").includes(searchTerm),
-      );
-    return matchesStatus && matchesSearch;
-  });
-
-  if (sortFilter.value === "name-asc") {
-    sorted.sort((a, b) => a.name.localeCompare(b.name, "ar"));
-  } else if (sortFilter.value === "name-desc") {
-    sorted.sort((a, b) => b.name.localeCompare(a.name, "ar"));
-  } else {
-    sorted.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
-  }
-  return sorted;
-}
-
-function renderMembers() {
-  const activeCount = members.filter((member) => member.active).length;
-  if (totalUsers) totalUsers.textContent = String(members.length);
-  if (activeUsers) activeUsers.textContent = String(activeCount);
-  if (inactiveUsers)
-    inactiveUsers.textContent = String(members.length - activeCount);
-
-  const filteredMembers = getFilteredMembers();
-  const pageSize = Number(pageSizeSelect.value) || PAGE_SIZE_DEFAULT;
-  const pageCount = Math.max(1, Math.ceil(filteredMembers.length / pageSize));
-  currentPage = Math.min(currentPage, pageCount);
-  const startIndex = (currentPage - 1) * pageSize;
-  const visibleMembers = filteredMembers.slice(
-    startIndex,
-    startIndex + pageSize,
-  );
-  renderTable(visibleMembers);
-  renderCards(visibleMembers);
-
-  const firstResult = filteredMembers.length ? startIndex + 1 : 0;
-  const lastResult = Math.min(startIndex + pageSize, filteredMembers.length);
-  if (resultsSummary) {
-    resultsSummary.textContent = `عرض ${firstResult}–${lastResult} من ${filteredMembers.length} عميل`;
-  }
-  if (pageIndicator)
-    pageIndicator.textContent = `${currentPage} / ${pageCount}`;
-  if (previousPageButton) previousPageButton.disabled = currentPage <= 1;
-  if (nextPageButton) nextPageButton.disabled = currentPage >= pageCount;
-}
-
-function setModalMode(isEditing) {
-  formTitle.textContent = isEditing ? "تعديل بيانات العميل" : "إضافة عميل جديد";
-  submitButton.textContent = isEditing ? "حفظ التعديلات" : "حفظ العميل";
-  activeField.classList.toggle("hidden", !isEditing);
-}
-
-function openClientModal(member = null) {
-  memberForm.reset();
-  editingMemberId = member?.id ?? null;
-  setModalMode(Boolean(member));
-
-  if (member) {
-    document.getElementById("name").value = member.name;
-    document.getElementById("occupation").value = member.occupation;
-    document.getElementById("mobile").value = member.mobile;
-    document.getElementById("nationalId").value = member.nationalId;
-    document.getElementById("nationality").value = member.nationality;
-    document.getElementById("address").value = member.address;
-    activeCheckbox.checked = member.active;
-    imagePreview.src = member.image;
-  } else {
-    imagePreview.src = DEFAULT_IMAGE;
-    activeCheckbox.checked = true;
-  }
-
-  overlay.classList.add("is-visible");
-  modal.classList.add("is-visible");
-  overlay.setAttribute("aria-hidden", "false");
-  modal.setAttribute("aria-hidden", "false");
-  document.body.classList.add("modal-open");
-  window.setTimeout(() => document.getElementById("name").focus(), 50);
-}
-
-function closeClientModal() {
-  overlay.classList.remove("is-visible");
-  modal.classList.remove("is-visible");
-  overlay.setAttribute("aria-hidden", "true");
-  modal.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("modal-open");
-  editingMemberId = null;
-  memberForm.reset();
-  imagePreview.src = DEFAULT_IMAGE;
-  setModalMode(false);
-}
-
-function readImageFile(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("The selected image could not be read."));
+      return entities[character];
     });
-    reader.addEventListener("error", () =>
-      reject(reader.error ?? new Error("Image reading failed.")),
-    );
-    reader.readAsDataURL(file);
-  });
-}
-
-async function submitClientForm(event) {
-  event.preventDefault();
-  if (!memberForm.reportValidity()) return;
-
-  const values = {
-    name: document.getElementById("name").value.trim(),
-    occupation: document.getElementById("occupation").value.trim(),
-    mobile: document.getElementById("mobile").value.trim(),
-    nationalId: document.getElementById("nationalId").value.trim(),
-    nationality: document.getElementById("nationality").value.trim(),
-    address: document.getElementById("address").value.trim(),
-  };
-  const imageFile = imageInput.files?.[0];
-  if (imageFile && imageFile.size > MAX_IMAGE_SIZE) {
-    showToast("حجم الصورة أكبر من 2 ميجابايت.", "error");
-    return;
-  }
-  if (imageFile && !imageFile.type.startsWith("image/")) {
-    showToast("الملف المحدد ليس صورة صالحة.", "error");
-    return;
   }
 
-  const duplicate = members.some(
-    (member) =>
-      member.id !== editingMemberId &&
-      (member.mobile === values.mobile ||
-        member.nationalId === values.nationalId),
-  );
-  if (duplicate) {
-    showToast("رقم الهاتف أو الرقم القومي مسجل لعميل آخر.", "error");
-    return;
+  function normalizeText(value = "") {
+    return String(value).trim().toLowerCase();
   }
 
-  let image =
-    members.find((member) => member.id === editingMemberId)?.image ??
-    DEFAULT_IMAGE;
-  if (imageFile) {
+  function safeImageSource(source) {
+    if (
+      typeof source === "string" &&
+      /^data:image\/(png|jpeg|webp|gif);base64,/i.test(source)
+    ) {
+      return source;
+    }
+
+    if (
+      typeof source === "string" &&
+      /^https:\/\//i.test(source)
+    ) {
+      return source;
+    }
+
+    return "../pic/images.png";
+  }
+
+  function showToast(message, type = "success") {
+    let toast = document.getElementById("clientToast");
+
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "clientToast";
+
+      Object.assign(toast.style, {
+        position: "fixed",
+        bottom: "25px",
+        right: "25px",
+        zIndex: "99999",
+        padding: "14px 22px",
+        borderRadius: "12px",
+        color: "#fff",
+        fontFamily: "Cairo, sans-serif",
+        fontSize: "14px",
+        fontWeight: "700",
+        boxShadow: "0 8px 25px rgba(0,0,0,.15)",
+        opacity: "0",
+        transform: "translateY(15px)",
+        transition: "all .25s ease",
+        maxWidth: "calc(100% - 40px)",
+      });
+
+      document.body.appendChild(toast);
+    }
+
+    toast.style.background =
+      type === "error" ? "#dc3545" : "#198754";
+
+    toast.textContent = message;
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+
+    clearTimeout(toast.timer);
+
+    toast.timer = setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(15px)";
+    }, 3000);
+  }
+
+  function formatDate(date) {
     try {
-      image = await readImageFile(imageFile);
-    } catch (error) {
-      console.error("Failed to read the selected client image.", error);
-      showToast("تعذر قراءة الصورة المحددة.", "error");
-      return;
+      return new Date(date).toLocaleDateString("ar-EG");
+    } catch {
+      return "";
     }
   }
 
-  const existingMember = members.find(
-    (member) => member.id === editingMemberId,
-  );
-  const nextMember = {
-    id: existingMember?.id ?? createId(),
-    ...values,
-    image,
-    active: existingMember ? activeCheckbox.checked : true,
-    createdAt: existingMember?.createdAt || new Date().toISOString(),
-  };
-  const nextMembers = existingMember
-    ? members.map((member) =>
-        member.id === existingMember.id ? nextMember : member,
+  /* =========================
+     5. LOCAL STORAGE
+  ========================= */
+
+  function getJobDisplayName(member) {
+    if (!member) return "";
+    if (member.jobId && window.MizanData?.getJobById) {
+      const job = window.MizanData.getJobById(member.jobId);
+      if (job) return job.name;
+    }
+    return member.occupation || member.job || "";
+  }
+
+  function migrateMemberJob(member) {
+    const next = { ...member };
+    next.occupation = next.occupation || next.job || "";
+    if (!next.jobId && next.occupation && window.MizanData?.getJobByName) {
+      const match = window.MizanData.getJobByName(next.occupation);
+      if (match) {
+        next.jobId = match.id;
+        next.occupation = match.name;
+      }
+    }
+    return next;
+  }
+
+  function loadMembers() {
+    try {
+      window.MizanData?.ensureSeedJobs?.();
+      const storedData = localStorage.getItem(STORAGE_KEY);
+
+      if (!storedData) {
+        members = [];
+        return;
+      }
+
+      const parsedData = JSON.parse(storedData);
+
+      members = Array.isArray(parsedData)
+        ? parsedData.map((member) => migrateMemberJob({
+            id: member.id || generateId(),
+            name: member.name || "",
+            jobId: member.jobId || "",
+            occupation: member.occupation || member.job || "",
+            mobile: member.mobile || "",
+            nationalId: member.nationalId || "",
+            nationality: member.nationality || "",
+            address: member.address || "",
+            image: member.image || "",
+            active:
+              typeof member.active === "boolean"
+                ? member.active
+                : true,
+            createdAt: member.createdAt || new Date().toISOString(),
+            updatedAt: member.updatedAt || member.createdAt || new Date().toISOString(),
+          }))
+        : [];
+    } catch (error) {
+      console.error("Error loading clients:", error);
+
+      members = [];
+
+      showToast(
+        "تعذر قراءة بيانات العملاء المحفوظة.",
+        "error"
+      );
+    }
+  }
+
+  function saveMembers() {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(members)
+      );
+
+      return true;
+    } catch (error) {
+      console.error("Error saving clients:", error);
+
+      if (
+        error.name === "QuotaExceededError" ||
+        error.name === "NS_ERROR_DOM_QUOTA_REACHED"
+      ) {
+        showToast(
+          "مساحة التخزين ممتلئة. حاول استخدام صورة أصغر.",
+          "error"
+        );
+      } else {
+        showToast(
+          "حدث خطأ أثناء حفظ بيانات العميل.",
+          "error"
+        );
+      }
+
+      return false;
+    }
+  }
+
+  /* =========================
+     6. MODAL
+  ========================= */
+
+  function populateJobDropdown(selectedJobId = "") {
+    if (!elements.jobId) return;
+    window.MizanData?.populateJobsSelect?.(elements.jobId, {
+      includePlaceholder: true,
+      placeholder: "اختر الوظيفة",
+      onlyActive: true,
+      selectedValue: selectedJobId || "",
+      includeJobId: selectedJobId || null,
+    });
+    // keep placeholder unselectable as value but selectable element exists
+    if (!selectedJobId) elements.jobId.value = "";
+  }
+
+  function openClientModal() {
+    elements.modal.classList.add("is-visible");
+    elements.overlay.classList.add("is-visible");
+
+    elements.modal.setAttribute("aria-hidden", "false");
+    elements.overlay.setAttribute("aria-hidden", "false");
+
+    document.body.classList.add("modal-open");
+
+    setTimeout(() => {
+      elements.name.focus();
+    }, 100);
+  }
+
+  function closeClientModal() {
+    elements.modal.classList.remove("is-visible");
+    elements.overlay.classList.remove("is-visible");
+
+    elements.modal.setAttribute("aria-hidden", "true");
+    elements.overlay.setAttribute("aria-hidden", "true");
+
+    document.body.classList.remove("modal-open");
+
+    resetForm();
+  }
+
+  function resetForm() {
+    elements.form.reset();
+
+    editingMemberId = null;
+    selectedImage = "";
+
+    elements.formTitle.textContent = "إضافة عميل جديد";
+    elements.submitButton.textContent = "حفظ العميل";
+
+    elements.imagePreview.src = "../pic/images.png";
+    populateJobDropdown("");
+
+    if (elements.activeField) {
+      elements.activeField.classList.add("hidden");
+    }
+
+    if (elements.clientActive) {
+      elements.clientActive.checked = true;
+    }
+
+    elements.form
+      .querySelectorAll("input, select")
+      .forEach((input) => {
+        input.setCustomValidity("");
+      });
+  }
+
+  /* =========================
+     7. ADD CLIENT
+  ========================= */
+
+  function openAddModal() {
+    resetForm();
+    openClientModal();
+  }
+
+  /* =========================
+     8. EDIT CLIENT
+  ========================= */
+
+  function editClient(id) {
+    const member = members.find(
+      (item) => String(item.id) === String(id)
+    );
+
+    if (!member) {
+      showToast("لم يتم العثور على العميل.", "error");
+      return;
+    }
+
+    resetForm();
+
+    editingMemberId = member.id;
+    selectedImage = member.image || "";
+
+    elements.name.value = member.name;
+    let jobId = member.jobId || "";
+    if (!jobId && member.occupation && window.MizanData?.getJobByName) {
+      const match = window.MizanData.getJobByName(member.occupation);
+      if (match) jobId = match.id;
+    }
+    populateJobDropdown(jobId);
+    if (jobId) elements.jobId.value = jobId;
+    elements.mobile.value = member.mobile;
+    elements.nationalId.value = member.nationalId;
+    elements.nationality.value = member.nationality;
+    elements.address.value = member.address || "";
+
+    elements.imagePreview.src = safeImageSource(
+      member.image
+    );
+
+    if (elements.clientActive) {
+      elements.clientActive.checked = member.active;
+    }
+
+    if (elements.activeField) {
+      elements.activeField.classList.remove("hidden");
+    }
+
+    elements.formTitle.textContent = "تعديل بيانات العميل";
+    elements.submitButton.textContent = "حفظ التعديلات";
+
+    openClientModal();
+  }
+
+  /* =========================
+     9. DELETE CLIENT
+  ========================= */
+
+  function deleteClient(id) {
+    const member = members.find(
+      (item) => String(item.id) === String(id)
+    );
+
+    if (!member) return;
+
+    const confirmed = window.confirm(
+      `هل أنت متأكد من حذف العميل "${member.name}"؟`
+    );
+
+    if (!confirmed) return;
+
+    const oldMembers = [...members];
+
+    members = members.filter(
+      (item) => String(item.id) !== String(id)
+    );
+
+    if (!saveMembers()) {
+      members = oldMembers;
+      return;
+    }
+
+    renderAll();
+
+    showToast("تم حذف العميل بنجاح.");
+  }
+
+  /* =========================
+     10. DUPLICATE VALIDATION
+  ========================= */
+
+  function checkDuplicates(mobile, nationalId) {
+    return members.find((member) => {
+      if (
+        editingMemberId &&
+        String(member.id) === String(editingMemberId)
+      ) {
+        return false;
+      }
+
+      return (
+        normalizeText(member.mobile) === normalizeText(mobile) ||
+        normalizeText(member.nationalId) === normalizeText(nationalId)
+      );
+    });
+  }
+
+  /* =========================
+     11. IMAGE UPLOAD
+  ========================= */
+
+  function readImage(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve("");
+        return;
+      }
+
+      const allowedTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/gif",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        reject(
+          new Error("نوع الصورة غير مدعوم.")
+        );
+        return;
+      }
+
+      if (file.size > MAX_IMAGE_SIZE) {
+        reject(
+          new Error("حجم الصورة يجب ألا يتجاوز 2 ميجابايت.")
+        );
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+
+      reader.onerror = () => {
+        reject(
+          new Error("تعذر قراءة الصورة.")
+        );
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (elements.imageInput) {
+    elements.imageInput.addEventListener("change", async () => {
+      const file = elements.imageInput.files?.[0];
+
+      if (!file) return;
+
+      try {
+        selectedImage = await readImage(file);
+
+        elements.imagePreview.src = selectedImage;
+      } catch (error) {
+        elements.imageInput.value = "";
+        selectedImage = "";
+
+        elements.imagePreview.src = "../pic/images.png";
+
+        showToast(error.message, "error");
+      }
+    });
+  }
+
+  /* =========================
+     12. FORM SUBMIT
+  ========================= */
+
+  async function submitClientForm(event) {
+    // منع إعادة تحميل الصفحة
+    event.preventDefault();
+
+    // منع تنفيذ الحفظ أكثر من مرة
+    if (elements.submitButton.disabled) return;
+
+    // التحقق من صحة الحقول المطلوبة
+    if (!elements.form.reportValidity()) {
+      return;
+    }
+
+    const name = elements.name.value.trim();
+    const jobId = elements.jobId.value.trim();
+    const job = jobId ? window.MizanData?.getJobById?.(jobId) : null;
+    const occupation = job ? job.name : "";
+    const mobile = elements.mobile.value.trim();
+    const nationalId = elements.nationalId.value.trim();
+    const nationality = elements.nationality.value.trim();
+    const address = elements.address.value.trim();
+
+    if (
+      !name ||
+      !jobId ||
+      !job ||
+      !mobile ||
+      !nationalId ||
+      !nationality
+    ) {
+      showToast(
+        "من فضلك أكمل جميع الحقول المطلوبة واختر الوظيفة.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (job.status !== "active") {
+      const existingSame = editingMemberId && members.find(m => String(m.id) === String(editingMemberId) && String(m.jobId) === String(jobId));
+      if (!existingSame) {
+        showToast("لا يمكن تعيين وظيفة غير مفعلة لسجل جديد.", "error");
+        return;
+      }
+    }
+
+    // التحقق من تكرار الهاتف أو الرقم القومي
+    const duplicate = checkDuplicates(
+      mobile,
+      nationalId
+    );
+
+    if (duplicate) {
+      if (
+        normalizeText(duplicate.mobile) === normalizeText(mobile)
+      ) {
+        showToast(
+          "رقم الهاتف مسجل بالفعل لعميل آخر.",
+          "error"
+        );
+      } else {
+        showToast(
+          "الرقم القومي مسجل بالفعل لعميل آخر.",
+          "error"
+        );
+      }
+
+      return;
+    }
+
+    elements.submitButton.disabled = true;
+    elements.submitButton.textContent = "جارٍ الحفظ...";
+
+    try {
+      let image = selectedImage;
+
+      const imageFile = elements.imageInput?.files?.[0];
+
+      // قراءة الصورة لو المستخدم اختار صورة جديدة
+      if (imageFile) {
+        image = await readImage(imageFile);
+      }
+
+      const existingMember = editingMemberId
+        ? members.find(
+            (item) =>
+              String(item.id) === String(editingMemberId)
+          )
+        : null;
+
+      const clientData = {
+        id: editingMemberId || generateId(),
+
+        name,
+        jobId,
+        occupation,
+        mobile,
+        nationalId,
+        nationality,
+        address,
+
+        image: image || existingMember?.image || "",
+
+        active: editingMemberId
+          ? Boolean(elements.clientActive?.checked)
+          : true,
+
+        createdAt:
+          existingMember?.createdAt ||
+          new Date().toISOString(),
+
+        updatedAt: new Date().toISOString(),
+      };
+
+      const oldMembers = [...members];
+
+      if (editingMemberId) {
+        members = members.map((member) =>
+          String(member.id) === String(editingMemberId)
+            ? clientData
+            : member
+        );
+      } else {
+        members.unshift(clientData);
+      }
+
+      // لا نغلق النافذة إلا بعد نجاح الحفظ
+      const saved = saveMembers();
+
+      if (!saved) {
+        members = oldMembers;
+        return;
+      }
+
+      currentPage = 1;
+
+      renderAll();
+
+      closeClientModal();
+
+      showToast(
+        editingMemberId
+          ? "تم تحديث بيانات العميل بنجاح."
+          : "تم إضافة العميل بنجاح."
+      );
+    } catch (error) {
+      console.error("Client submit error:", error);
+
+      showToast(
+        error.message || "حدث خطأ أثناء حفظ العميل.",
+        "error"
+      );
+    } finally {
+      elements.submitButton.disabled = false;
+
+      elements.submitButton.textContent = editingMemberId
+        ? "حفظ التعديلات"
+        : "حفظ العميل";
+    }
+  }
+
+  /* =========================
+     13. FILTER CLIENTS
+  ========================= */
+
+  function getFilteredMembers() {
+    let result = [...members];
+
+    const searchValue = normalizeText(
+      elements.searchInput.value
+    );
+
+    const statusValue = elements.statusFilter.value;
+
+    if (searchValue) {
+      result = result.filter((member) => {
+        const occupationName = getJobDisplayName(member);
+        return (
+          normalizeText(member.name).includes(searchValue) ||
+          normalizeText(member.mobile).includes(searchValue) ||
+          normalizeText(member.nationalId).includes(searchValue) ||
+          normalizeText(occupationName).includes(searchValue) ||
+          normalizeText(member.nationality).includes(searchValue)
+        );
+      });
+    }
+
+    if (statusValue === "active") {
+      result = result.filter(
+        (member) => member.active
+      );
+    }
+
+    if (statusValue === "inactive") {
+      result = result.filter(
+        (member) => !member.active
+      );
+    }
+
+    const sortValue = elements.sortFilter.value;
+
+    if (sortValue === "newest") {
+      result.sort(
+        (a, b) =>
+          new Date(b.createdAt) - new Date(a.createdAt)
+      );
+    }
+
+    if (sortValue === "name-asc") {
+      result.sort((a, b) =>
+        a.name.localeCompare(b.name, "ar")
+      );
+    }
+
+    if (sortValue === "name-desc") {
+      result.sort((a, b) =>
+        b.name.localeCompare(a.name, "ar")
+      );
+    }
+
+    return result;
+  }
+
+  /* =========================
+     14. RENDER TABLE
+  ========================= */
+
+  function renderTable(data) {
+    if (!data.length) {
+      elements.membersTable.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center;padding:35px;">
+            <div style="color:#94a3b8;font-weight:700;">
+              لا توجد بيانات عملاء لعرضها.
+            </div>
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+    elements.membersTable.innerHTML = data
+      .map(
+        (member) => `
+          <tr>
+            <td>
+              <div class="client-cell">
+                <img
+                  class="client-avatar"
+                  src="${safeImageSource(member.image)}"
+                  alt="${escapeHTML(member.name)}"
+                  onerror="this.src='../pic/images.png'"
+                />
+
+                <div class="client-name">
+                  <strong>${escapeHTML(member.name)}</strong>
+                  <span>
+                    ${formatDate(member.createdAt)}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <td>${escapeHTML(getJobDisplayName(member))}</td>
+
+            <td class="number-cell">
+              ${escapeHTML(member.mobile)}
+            </td>
+
+            <td class="number-cell">
+              ${escapeHTML(member.nationalId)}
+            </td>
+
+            <td>${escapeHTML(member.nationality)}</td>
+
+            <td>
+              <span class="status-badge ${
+                member.active ? "active" : "inactive"
+              }">
+                <span></span>
+                ${member.active ? "نشط" : "غير نشط"}
+              </span>
+            </td>
+
+            <td>
+              <div class="row-actions">
+                <button
+                  type="button"
+                  class="icon-button"
+                  data-action="edit"
+                  data-id="${escapeHTML(member.id)}"
+                  title="تعديل العميل"
+                  aria-label="تعديل العميل"
+                >
+                  <span class="material-symbols-outlined">
+                    edit
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  class="icon-button"
+                  data-action="delete"
+                  data-id="${escapeHTML(member.id)}"
+                  title="حذف العميل"
+                  aria-label="حذف العميل"
+                >
+                  <span class="material-symbols-outlined">
+                    delete
+                  </span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `
       )
-    : [nextMember, ...members];
-
-  if (!saveMembers(nextMembers)) return;
-  members = nextMembers;
-  currentPage = 1;
-  renderMembers();
-  closeClientModal();
-  showToast(
-    existingMember ? "تم تحديث بيانات العميل." : "تمت إضافة العميل بنجاح.",
-  );
-}
-
-function handleActionClick(event) {
-  const button = event.target.closest("button[data-action]");
-  if (!button) return;
-  const member = members.find((entry) => entry.id === button.dataset.id);
-  if (!member) {
-    showToast("تعذر العثور على العميل المطلوب.", "error");
-    return;
+      .join("");
   }
 
-  if (button.dataset.action === "edit") {
-    openClientModal(member);
-    return;
+  /* =========================
+     15. RENDER MOBILE CARDS
+  ========================= */
+
+  function renderCards(data) {
+    if (!elements.membersCards) return;
+
+    if (!data.length) {
+      elements.membersCards.innerHTML = "";
+      return;
+    }
+
+    elements.membersCards.innerHTML = data
+      .map(
+        (member) => `
+          <article class="client-card">
+            <div class="client-card-heading">
+              <img
+                class="client-avatar"
+                src="${safeImageSource(member.image)}"
+                alt="${escapeHTML(member.name)}"
+                onerror="this.src='../pic/images.png'"
+              />
+
+              <div class="client-name">
+                <strong>${escapeHTML(member.name)}</strong>
+                <span>${escapeHTML(getJobDisplayName(member))}</span>
+              </div>
+            </div>
+
+            <div class="client-card-details">
+              <p>
+                <strong>الهاتف:</strong>
+                ${escapeHTML(member.mobile)}
+              </p>
+
+              <p>
+                <strong>الرقم القومي:</strong>
+                ${escapeHTML(member.nationalId)}
+              </p>
+
+              <p>
+                <strong>الجنسية:</strong>
+                ${escapeHTML(member.nationality)}
+              </p>
+
+              <p>
+                <strong>العنوان:</strong>
+                ${escapeHTML(member.address || "غير محدد")}
+              </p>
+
+              <p>
+                <strong>الحالة:</strong>
+                ${member.active ? "نشط" : "غير نشط"}
+              </p>
+            </div>
+
+            <div class="row-actions">
+              <button
+                type="button"
+                class="secondary-button"
+                data-action="edit"
+                data-id="${escapeHTML(member.id)}"
+              >
+                تعديل
+              </button>
+
+              <button
+                type="button"
+                class="secondary-button"
+                data-action="delete"
+                data-id="${escapeHTML(member.id)}"
+              >
+                حذف
+              </button>
+            </div>
+          </article>
+        `
+      )
+      .join("");
   }
-  if (button.dataset.action === "delete") {
-    if (!window.confirm(`هل تريد حذف العميل "${member.name}"؟`)) return;
-    const nextMembers = members.filter((entry) => entry.id !== member.id);
-    if (!saveMembers(nextMembers)) return;
-    members = nextMembers;
-    renderMembers();
-    showToast("تم حذف العميل.");
-    return;
+
+  /* =========================
+     16. RENDER STATISTICS
+  ========================= */
+
+  function renderStatistics() {
+    const total = members.length;
+
+    const active = members.filter(
+      (member) => member.active
+    ).length;
+
+    const inactive = total - active;
+
+    elements.totalUsers.textContent = total;
+    elements.activeUsers.textContent = active;
+    elements.inactiveUsers.textContent = inactive;
   }
-  if (button.dataset.action === "toggle") {
-    const nextMembers = members.map((entry) =>
-      entry.id === member.id ? { ...entry, active: !entry.active } : entry,
+
+  /* =========================
+     17. PAGINATION
+  ========================= */
+
+  function renderPagination(filteredMembers) {
+    const total = filteredMembers.length;
+
+    const totalPages = Math.max(
+      1,
+      Math.ceil(total / pageSize)
     );
-    if (!saveMembers(nextMembers)) return;
-    members = nextMembers;
-    renderMembers();
-    showToast(member.active ? "تم إيقاف العميل." : "تم تنشيط العميل.");
-  }
-}
 
-document
-  .getElementById("addClientButton")
-  .addEventListener("click", () => openClientModal());
-document
-  .getElementById("closeClientModal")
-  .addEventListener("click", closeClientModal);
-document
-  .getElementById("cancelClientModal")
-  .addEventListener("click", closeClientModal);
-overlay.addEventListener("click", closeClientModal);
-memberForm.addEventListener("submit", submitClientForm);
-membersTable.addEventListener("click", handleActionClick);
-membersCards.addEventListener("click", handleActionClick);
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+    }
 
-searchInput.addEventListener("input", () => {
-  currentPage = 1;
-  renderMembers();
-});
-statusFilter.addEventListener("change", () => {
-  currentPage = 1;
-  renderMembers();
-});
-sortFilter.addEventListener("change", () => {
-  currentPage = 1;
-  renderMembers();
-});
-pageSizeSelect.addEventListener("change", () => {
-  currentPage = 1;
-  renderMembers();
-});
-previousPageButton.addEventListener("click", () => {
-  if (currentPage > 1) {
-    currentPage -= 1;
-    renderMembers();
-  }
-});
-nextPageButton.addEventListener("click", () => {
-  const pageCount = Math.max(
-    1,
-    Math.ceil(getFilteredMembers().length / Number(pageSizeSelect.value)),
-  );
-  if (currentPage < pageCount) {
-    currentPage += 1;
-    renderMembers();
-  }
-});
+    const startIndex = (currentPage - 1) * pageSize;
 
-imageInput.addEventListener("change", () => {
-  const file = imageInput.files?.[0];
-  if (!file) {
-    imagePreview.src =
-      members.find((member) => member.id === editingMemberId)?.image ??
-      DEFAULT_IMAGE;
-    return;
-  }
-  if (!file.type.startsWith("image/") || file.size > MAX_IMAGE_SIZE) {
-    imageInput.value = "";
-    imagePreview.src =
-      members.find((member) => member.id === editingMemberId)?.image ??
-      DEFAULT_IMAGE;
-    showToast(
-      file.size > MAX_IMAGE_SIZE
-        ? "حجم الصورة أكبر من 2 ميجابايت."
-        : "الملف المحدد ليس صورة صالحة.",
-      "error",
+    const endIndex = Math.min(
+      startIndex + pageSize,
+      total
     );
-    return;
+
+    const currentData = filteredMembers.slice(
+      startIndex,
+      endIndex
+    );
+
+    elements.pageIndicator.textContent =
+      `${currentPage} / ${totalPages}`;
+
+    elements.resultsSummary.textContent =
+      total === 0
+        ? "عرض 0 من 0 عميل"
+        : `عرض ${startIndex + 1} - ${endIndex} من ${total} عميل`;
+
+    elements.previousPage.disabled = currentPage <= 1;
+    elements.nextPage.disabled = currentPage >= totalPages;
+
+    return currentData;
   }
-  imagePreview.src = URL.createObjectURL(file);
-});
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    if (modal.classList.contains("is-visible")) closeClientModal();
-    else if (!document.getElementById("overlay").classList.contains("hidden"))
-      window.closeModal?.();
+  /* =========================
+     18. RENDER ALL
+  ========================= */
+
+  function renderAll() {
+    renderStatistics();
+
+    const filteredMembers = getFilteredMembers();
+
+    const currentData = renderPagination(
+      filteredMembers
+    );
+
+    renderTable(currentData);
+    renderCards(currentData);
   }
-});
 
-window.addEventListener("storage", (event) => {
-  if (event.key !== STORAGE_KEY) return;
-  members = loadMembers();
-  renderMembers();
-});
+  /* =========================
+     19. EVENT LISTENERS
+  ========================= */
 
-members = loadMembers();
-renderMembers();
+  // فتح نافذة إضافة عميل
+  elements.addButton.addEventListener(
+    "click",
+    openAddModal
+  );
+
+  // إغلاق النافذة
+  elements.closeModal?.addEventListener(
+    "click",
+    closeClientModal
+  );
+
+  elements.cancelModal?.addEventListener(
+    "click",
+    closeClientModal
+  );
+
+  elements.overlay.addEventListener(
+    "click",
+    closeClientModal
+  );
+
+  // أهم جزء: ربط زرار الحفظ بالفورم
+  elements.form.addEventListener(
+    "submit",
+    submitClientForm
+  );
+
+  // البحث
+  elements.searchInput.addEventListener(
+    "input",
+    () => {
+      currentPage = 1;
+      renderAll();
+    }
+  );
+
+  // الفلترة
+  elements.statusFilter.addEventListener(
+    "change",
+    () => {
+      currentPage = 1;
+      renderAll();
+    }
+  );
+
+  // الترتيب
+  elements.sortFilter.addEventListener(
+    "change",
+    () => {
+      currentPage = 1;
+      renderAll();
+    }
+  );
+
+  // عدد العناصر في الصفحة
+  elements.pageSize?.addEventListener(
+    "change",
+    () => {
+      pageSize = Number(elements.pageSize.value) || DEFAULT_PAGE_SIZE;
+      currentPage = 1;
+      renderAll();
+    }
+  );
+
+  // الصفحة السابقة
+  elements.previousPage?.addEventListener(
+    "click",
+    () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderAll();
+      }
+    }
+  );
+
+  // الصفحة التالية
+  elements.nextPage?.addEventListener(
+    "click",
+    () => {
+      const totalPages = Math.max(
+        1,
+        Math.ceil(getFilteredMembers().length / pageSize)
+      );
+
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderAll();
+      }
+    }
+  );
+
+  // تنفيذ التعديل والحذف من الجدول والكروت
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(
+      "[data-action][data-id]"
+    );
+
+    if (!button) return;
+
+    const action = button.dataset.action;
+    const id = button.dataset.id;
+
+    if (action === "edit") {
+      editClient(id);
+    }
+
+    if (action === "delete") {
+      deleteClient(id);
+    }
+  });
+
+  // إغلاق النافذة بزر Escape
+  document.addEventListener("keydown", (event) => {
+    if (
+      event.key === "Escape" &&
+      elements.modal.classList.contains("is-visible")
+    ) {
+      closeClientModal();
+    }
+  });
+
+  window.addEventListener("storage", (event) => {
+    if (event.key === window.MizanData?.JOBS_KEY) {
+      renderAll();
+      if (elements.modal.classList.contains("is-visible")) {
+        populateJobDropdown(elements.jobId.value);
+      }
+    }
+  });
+
+  /* =========================
+     20. INITIALIZATION
+  ========================= */
+
+  loadMembers();
+
+  if (elements.pageSize) {
+    pageSize =
+      Number(elements.pageSize.value) || DEFAULT_PAGE_SIZE;
+  }
+
+  renderAll();
+
+  console.log("MIZAN Clients System Initialized Successfully");
+});

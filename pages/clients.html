@@ -18,6 +18,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../style/clients.css" />
+    <link rel="stylesheet" href="../style/modal-system.css" />
   </head>
 
   <body>
@@ -198,10 +199,10 @@
       </a>
     </main>
 
-    <div id="clientOverlay" class="client-overlay" aria-hidden="true"></div>
+    <div id="clientOverlay" class="client-overlay mizan-overlay" aria-hidden="true"></div>
     <section
       id="clientModal"
-      class="client-modal mt-10"
+      class="client-modal mt-10 mizan-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="memberModalTitle"
@@ -240,14 +241,9 @@
           </label>
           <label class="form-field">
             <span>الوظيفة <b>*</b></span>
-            <input
-              id="occupation"
-              name="occupation"
-              type="text"
-              maxlength="80"
-              placeholder="المهنة أو الوظيفة"
-              required
-            />
+            <select id="jobId" name="jobId" required>
+              <option value="">اختر الوظيفة</option>
+            </select>
           </label>
           <label class="form-field">
             <span>رقم الهاتف <b>*</b></span>
@@ -331,12 +327,12 @@
 
     <div
       id="overlay"
-      class="notification-overlay hidden opacity-0"
+      class="notification-overlay hidden opacity-0 mizan-overlay"
       aria-hidden="true"
     ></div>
     <section
       id="modal"
-      class="notification-modal hidden opacity-0 scale-95"
+      class="notification-modal hidden opacity-0 scale-95 mizan-modal mizan-modal--sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modalTitle"
@@ -359,6 +355,7 @@
       </div>
     </section>
 
+    <script src="../script/mizan-data.js"></script>
     <script src="../script/clients.js"></script>
     <script src="../script/notifications.js"></script>
     <script src="../script/unified-navbar.js"></script>

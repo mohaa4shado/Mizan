@@ -1100,3 +1100,89 @@ button:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.case-lookup-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.case-lookup-wrap input {
+  flex: 1;
+}
+
+.case-lookup-status {
+  min-width: 90px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.case-lookup-status.loading { color: #d97706; }
+.case-lookup-status.success { color: #059669; }
+.case-lookup-status.error { color: #dc2626; }
+
+.case-lookup-message {
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+.case-lookup-message.hidden { display: none; }
+.case-lookup-message.success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.case-lookup-message.error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.case-lookup-message.info { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+.case-info-card {
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 14px;
+}
+.case-info-card.hidden { display: none; }
+.case-info-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #1e3a8a;
+}
+.case-info-header h4 { margin: 0; font-size: 14px; font-weight: 800; }
+.case-info-header .material-symbols-outlined { font-size: 20px; }
+.case-info-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+.case-info-item {
+  background: #fff;
+  border: 1px solid #e6edf7;
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-width: 0;
+}
+.case-info-label {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+.case-info-value {
+  display: block;
+  font-size: 13px;
+  color: #0f172a;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+@media (max-width: 700px) {
+  .case-info-body { grid-template-columns: 1fr; }
+  .case-lookup-wrap { flex-direction: column; align-items: stretch; }
+  .case-lookup-status { min-width: 0; }
+}

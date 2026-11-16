@@ -23,7 +23,9 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../style/emb.css" />
+    <link rel="stylesheet" href="../style/modal-system.css" />
     <script src="../script/unified-navbar.js"></script>
+    <script src="../script/mizan-data.js"></script>
   </head>
 
   <body class="min-h-screen bg-slate-50 text-slate-800">
@@ -138,13 +140,13 @@
     <!-- Employee Modal -->
     <div
       id="employeeModal"
-      class="hidden fixed inset-0 z-[1100] items-center justify-center bg-slate-900/45 backdrop-blur-sm"
+      class="hidden fixed inset-0 z-[1100] items-center justify-center bg-slate-900/45 backdrop-blur-sm mizan-overlay"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modalTitle"
     >
-      <section class="mx-auto max-w-2xl bg-white">
-        <div class="flex items-center justify-between px-6 py-5 text-black-500">
+      <section class="mx-auto max-w-2xl bg-white mizan-modal">
+        <div class="modal-head flex items-center justify-between px-6 py-5 text-black-500">
           <div>
             <h2 id="modalTitle" class="m-0 text-xl font-bold ">
               إضافة موظف جديد
@@ -182,14 +184,14 @@
 
             <label class="space-y-1 text-sm font-bold">
               <span>الوظيفة</span>
-              <input
-                id="role"
-                name="role"
-                type="text"
-                placeholder="المهنة أو الوظيفة"
+              <select
+                id="jobId"
+                name="jobId"
                 required
-                class="w-full border px-4 py-3"
-              />
+                class="w-full border px-4 py-3 bg-white"
+              >
+                <option value="">اختر الوظيفة</option>
+              </select>
             </label>
 
             <label class="space-y-1 text-sm font-bold">
@@ -246,7 +248,7 @@
             </label>
           </div>
 
-          <div class="flex flex-row-reverse gap-3 pt-2">
+          <div class="modal-actions flex flex-row-reverse gap-3 pt-2">
             <button type="submit" class="new-employee-btn">حفظ البيانات</button>
             <button
               id="cancelModal"

@@ -100,7 +100,7 @@ const seed = [
 const $ = (selector) => document.querySelector(selector);
 
 // Form Fields
-const fields = ["name", "role", "salary", "mobile", "address", "balance"];
+const fields = ["name", "salary", "mobile", "address", "balance"];
 
 // Format Numbers
 const fmt = (number) =>
@@ -144,23 +144,46 @@ function getRoleClass(role) {
    Data Management
    ======================================== */
 
+function getEmployeeJobName(employee) {
+  if (!employee) return "";
+  if (employee.jobId && window.MizanData?.getJobById) {
+    const job = window.MizanData.getJobById(employee.jobId);
+    if (job) return job.name;
+  }
+  return employee.role || "";
+}
+
+function migrateEmployeeJob(employee) {
+  const next = { ...employee };
+  next.role = next.role || "";
+  if (!next.jobId && next.role && window.MizanData?.getJobByName) {
+    const match = window.MizanData.getJobByName(next.role);
+    if (match) {
+      next.jobId = match.id;
+      next.role = match.name;
+    }
+  }
+  return next;
+}
+
 // Load Employees
 function loadData() {
   try {
+    window.MizanData?.ensureSeedJobs?.();
     const saved = localStorage.getItem(KEY);
 
     if (saved !== null) {
       const parsed = JSON.parse(saved);
 
       if (Array.isArray(parsed)) {
-        return parsed;
+        return parsed.map(migrateEmployeeJob);
       }
     }
 
-    return [...seed];
+    return seed.map(migrateEmployeeJob);
   } catch (error) {
     console.error("Error loading employees:", error);
-    return [...seed];
+    return seed.map(migrateEmployeeJob);
   }
 }
 
@@ -198,7 +221,7 @@ function updateStatistics() {
   $("#salarySum").textContent = formatMoney(totalSalary);
 
   // Total Unique Roles
-  const totalRoles = new Set(data.map((employee) => employee.role)).size;
+  const totalRoles = new Set(data.map((employee) => getEmployeeJobName(employee)).filter(Boolean)).size;
 
   $("#roles").textContent = fmt(totalRoles);
 }
@@ -215,7 +238,7 @@ function draw() {
 
   // Filter Employees
   const filtered = data.filter((employee) =>
-    [employee.name, employee.role, employee.mobile, employee.address].some(
+    [employee.name, getEmployeeJobName(employee), employee.mobile, employee.address].some(
       (value) => String(value).toLowerCase().includes(query),
     ),
   );
@@ -244,8 +267,8 @@ function draw() {
 
               <!-- Employee Role -->
               <td>
-                <span class="role-badge ${getRoleClass(employee.role)}">
-                  ${esc(employee.role)}
+                <span class="role-badge ${getRoleClass(getEmployeeJobName(employee))}">
+                  ${esc(getEmployeeJobName(employee))}
                 </span>
               </td>
 
@@ -332,6 +355,19 @@ function draw() {
    Employee Modal
    ======================================== */
 
+function populateEmployeeJobDropdown(selectedJobId = "") {
+  const select = document.getElementById("jobId");
+  if (!select) return;
+  window.MizanData?.populateJobsSelect?.(select, {
+    includePlaceholder: true,
+    placeholder: "اختر الوظيفة",
+    onlyActive: true,
+    selectedValue: selectedJobId || "",
+    includeJobId: selectedJobId || null,
+  });
+  if (!selectedJobId) select.value = "";
+}
+
 // Open Employee Modal
 function open(employee = null) {
   editId = employee?.id ?? null;
@@ -348,9 +384,18 @@ function open(employee = null) {
   // Fill Form
   fields.forEach((field) => {
     const input = $("#" + field);
-
+    if (!input) return;
     input.value = employee ? employee[field] : field === "balance" ? "0" : "";
   });
+
+  let jobId = employee?.jobId || "";
+  if (!jobId && employee?.role && window.MizanData?.getJobByName) {
+    const match = window.MizanData.getJobByName(employee.role);
+    if (match) jobId = match.id;
+  }
+  populateEmployeeJobDropdown(jobId);
+  const jobSelect = document.getElementById("jobId");
+  if (jobSelect && jobId) jobSelect.value = jobId;
 
   // Show Modal
   $("#employeeModal").classList.remove("hidden");
@@ -395,6 +440,7 @@ $("#employeeForm").addEventListener("submit", (event) => {
   // Collect Form Data
   fields.forEach((field) => {
     const input = $("#" + field);
+    if (!input) return;
 
     employee[field] =
       field === "salary" || field === "balance"
@@ -402,15 +448,30 @@ $("#employeeForm").addEventListener("submit", (event) => {
         : input.value.trim();
   });
 
+  const jobSelect = document.getElementById("jobId");
+  const jobId = jobSelect ? jobSelect.value.trim() : "";
+  const job = jobId ? window.MizanData?.getJobById?.(jobId) : null;
+  employee.jobId = jobId;
+  employee.role = job ? job.name : "";
+
   // Validation
   if (
     !employee.name ||
-    !employee.role ||
+    !employee.jobId ||
+    !job ||
     !employee.mobile ||
     !employee.address
   ) {
-    showError("أكمل الحقول المطلوبة من فضلك");
+    showError("أكمل الحقول المطلوبة واختر الوظيفة من القائمة");
     return;
+  }
+
+  if (job.status !== "active") {
+    const existingSame = editId !== null && data.find((item) => item.id === editId && String(item.jobId) === String(jobId));
+    if (!existingSame) {
+      showError("لا يمكن تعيين وظيفة غير مفعلة لموظف جديد");
+      return;
+    }
   }
 
   // Validate Salary and Balance
@@ -595,6 +656,17 @@ if (loginForm) {
     loginMessage.classList.remove("hidden");
   });
 }
+
+window.addEventListener("storage", (event) => {
+  if (event.key === window.MizanData?.JOBS_KEY) {
+    draw();
+    const modal = document.getElementById("employeeModal");
+    const jobSelect = document.getElementById("jobId");
+    if (modal && !modal.classList.contains("hidden") && jobSelect) {
+      populateEmployeeJobDropdown(jobSelect.value);
+    }
+  }
+});
 
 /* ========================================
    Initialize Application

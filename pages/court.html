@@ -16,6 +16,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../style/court.css" />
+    <link rel="stylesheet" href="../style/modal-system.css" />
     <script src="../script/unified-navbar.js"></script>
   </head>
   <body>
@@ -193,16 +194,19 @@
       </a>
     </main>
 
-    <div id="caseOverlay" class="case-overlay" aria-hidden="true"></div>
+    <div
+      id="caseOverlay"
+      class="case-overlay mizan-overlay"
+      aria-hidden="true"
+    ></div>
     <section
       id="caseModal"
-      class="case-modal"
+      class="case-modal mizan-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="caseModalTitle"
       aria-hidden="true"
     >
-  
       <div class="modal-heading">
         <div>
           <span class="eyebrow">بيانات القضية</span>
@@ -244,15 +248,15 @@
             </select></label
           >
           <label class="form-field"
-            ><span>هاتف العميل <b>*</b></span
-            ><input
+            ><span>هاتف العميل <b>*</b></span>
+
+            <input
+              type="tel"
               name="clientPhone"
               id="clientPhone"
-              required
-              maxlength="11"
-              inputmode="numeric"
-              placeholder="01XXXXXXXX"
-          /></label>
+              placeholder="أدخل رقم الهاتف"
+            />
+          </label>
           <label class="form-field"
             ><span>تاريخ التسجيل <b>*</b></span
             ><input name="registrationDate" type="date" required
@@ -332,9 +336,16 @@
             ><span>اسم الخصم</span><input name="opponentName" maxlength="100"
           /></label>
           <label class="form-field"
-            ><span>هاتف الخصم</span
-            ><input name="opponentPhone" maxlength="11" inputmode="numeric"
-          /></label>
+            >
+            <span>هاتف الخصم</span>
+
+            <input
+              type="tel"
+              name="opponentPhone"
+              id="opponentPhone"
+              placeholder="أدخل رقم هاتف الخصم"
+          />
+        </label>
           <label class="form-field full-field"
             ><span>ملاحظات</span
             ><textarea

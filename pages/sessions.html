@@ -23,8 +23,10 @@
   />
 
   <link rel="stylesheet" href="../style/sessions.css" />
+  <link rel="stylesheet" href="../style/modal-system.css" />
 
   <script src="../script/unified-navbar.js"></script>
+  <script src="../script/mizan-data.js"></script>
 </head>
 
 <body>
@@ -222,13 +224,13 @@
   <!-- Add / Edit Session Modal -->
   <div
     id="sessionModal"
-    class="modal hidden"
+    class="modal hidden mizan-overlay"
     role="dialog"
     aria-modal="true"
     aria-labelledby="modalTitle"
   >
 
-    <section class="modal-card">
+    <section class="modal-card mizan-modal">
 
       <header class="modal-header">
 
@@ -281,18 +283,36 @@
 
           <div class="form-grid">
 
-            <label class="field">
+            <label class="field field-full">
 
               <span>رقم القضية <i>*</i></span>
 
-              <input
-                id="caseNumber"
-                name="caseNumber"
-                required
-                placeholder="مثال: 111-21"
-              />
+              <div class="case-lookup-wrap">
+                <input
+                  id="caseNumber"
+                  name="caseNumber"
+                  required
+                  placeholder="أدخل رقم القضية للبحث التلقائي"
+                  autocomplete="off"
+                />
+                <span id="caseLookupStatus" class="case-lookup-status" aria-live="polite"></span>
+              </div>
 
             </label>
+
+
+            <div id="caseInfoCard" class="case-info-card hidden field-full" aria-live="polite">
+              <div class="case-info-header">
+                <span class="material-symbols-outlined">folder_shared</span>
+                <h4>بيانات القضية والعميل</h4>
+              </div>
+              <div id="caseInfoBody" class="case-info-body"></div>
+            </div>
+
+            <div id="caseLookupMessage" class="case-lookup-message hidden field-full" role="status"></div>
+
+            <input type="hidden" id="caseId" name="caseId" />
+            <input type="hidden" id="caseNumberStored" name="caseNumberStored" />
 
 
             <label class="field">
@@ -330,6 +350,48 @@
                 id="circuit"
                 name="circuit"
                 placeholder="اسم الدائرة"
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>نوع القضية</span>
+
+              <input
+                id="caseType"
+                name="caseType"
+                placeholder="نوع القضية"
+                readonly
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>حالة القضية</span>
+
+              <input
+                id="caseStatus"
+                name="caseStatus"
+                placeholder="حالة القضية"
+                readonly
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>المحامي المكلف</span>
+
+              <input
+                id="assignedLawyer"
+                name="assignedLawyer"
+                placeholder="المحامي المكلف"
+                readonly
               />
 
             </label>
@@ -376,6 +438,34 @@
                 name="clientName"
                 required
                 placeholder="اسم العميل"
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>هاتف العميل</span>
+
+              <input
+                id="clientPhone"
+                name="clientPhone"
+                placeholder="رقم الهاتف"
+                readonly
+              />
+
+            </label>
+
+
+            <label class="field">
+
+              <span>عنوان العميل</span>
+
+              <input
+                id="clientAddress"
+                name="clientAddress"
+                placeholder="العنوان"
+                readonly
               />
 
             </label>

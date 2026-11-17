@@ -94,8 +94,10 @@
   }
 
   function formatNumber(value) {
+    // Centralized English-digit formatting (MizanNumbers is loaded first).
+    if (window.MizanNumbers) return window.MizanNumbers.formatNumber(value);
     try {
-      return new Intl.NumberFormat("ar-EG").format(Number(value) || 0);
+      return new Intl.NumberFormat("en-US").format(Number(value) || 0);
     } catch {
       return String(Number(value) || 0);
     }

@@ -1,0 +1,22 @@
+/* =========================================================
+   MIZAN - English digit formatting
+   Keeps the Arabic RTL layout and Cairo design system intact.
+   ========================================================= */
+
+.number,
+.numeric,
+.number-cell,
+.money,
+.page-indicator,
+input[type="number"],
+input[type="tel"] {
+    font-variant-numeric: lining-nums;
+}
+
+/* Optional helper for individual numeric cells that need LTR reading order.
+   Intentionally opt-in: the page direction stays RTL. */
+.num-ltr,
+[data-numeric="ltr"] {
+    direction: ltr;
+    unicode-bidi: isolate;
+}

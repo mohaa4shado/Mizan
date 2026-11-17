@@ -40,7 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatDate(value) {
     if (!value) return "—";
     try {
-      return new Date(value).toLocaleDateString("ar-EG");
+      const formatted = new Date(value).toLocaleDateString("ar-EG");
+      return window.MizanNumbers
+        ? window.MizanNumbers.toEnglishNumbers(formatted)
+        : formatted;
     } catch {
       return String(value);
     }

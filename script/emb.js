@@ -104,9 +104,11 @@ const fields = ["name", "salary", "mobile", "address", "balance"];
 
 // Format Numbers
 const fmt = (number) =>
-  new Intl.NumberFormat("ar-EG", {
-    maximumFractionDigits: 2,
-  }).format(Number(number) || 0);
+  window.MizanNumbers
+    ? window.MizanNumbers.formatNumber(number, { maximumFractionDigits: 2 })
+    : new Intl.NumberFormat("en-US", {
+        maximumFractionDigits: 2,
+      }).format(Number(number) || 0);
 
 // Escape HTML
 const esc = (value) =>

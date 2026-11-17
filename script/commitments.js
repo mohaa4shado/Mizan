@@ -67,12 +67,12 @@ function money(v) {
   }).format(Number(v) || 0);
 }
 function stats() {
-  $("#totalCount").textContent = data.length.toLocaleString("ar-EG");
+  $("#totalCount").textContent = data.length.toLocaleString("en-US");
   $("#totalAmount").textContent =
     money(data.reduce((s, x) => s + (+x.amount || 0), 0)) + " ج.م";
   $("#customerCount").textContent = new Set(
     data.map((x) => x.customerName.trim()),
-  ).size.toLocaleString("ar-EG");
+  ).size.toLocaleString("en-US");
 }
 function render() {
   stats();
@@ -87,8 +87,8 @@ function render() {
     ),
     size = $("#pageSize").value,
     shown = size === "all" ? filtered : filtered.slice(0, +size);
-  $("#resultsCount").textContent = filtered.length.toLocaleString("ar-EG");
-  $("#shownCount").textContent = shown.length.toLocaleString("ar-EG");
+  $("#resultsCount").textContent = filtered.length.toLocaleString("en-US");
+  $("#shownCount").textContent = shown.length.toLocaleString("en-US");
   $("#tableBody").innerHTML = shown.length
     ? shown
         .map(

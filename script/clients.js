@@ -197,7 +197,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function formatDate(date) {
     try {
-      return new Date(date).toLocaleDateString("ar-EG");
+      const formatted = new Date(date).toLocaleDateString("ar-EG");
+      return window.MizanNumbers
+        ? window.MizanNumbers.toEnglishNumbers(formatted)
+        : formatted;
     } catch {
       return "";
     }

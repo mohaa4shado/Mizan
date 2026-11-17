@@ -69,9 +69,11 @@ function saveToStorage() {
 }
 
 function formatNumber(value) {
-  return new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 }).format(
-    Number(value) || 0,
-  );
+  return window.MizanNumbers
+    ? window.MizanNumbers.formatNumber(value, { maximumFractionDigits: 2 })
+    : new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(
+        Number(value) || 0,
+      );
 }
 
 function escapeHTML(value) {
@@ -239,10 +241,15 @@ $("#printReportBtn").addEventListener("click", () => window.print());
 
 window.addEventListener("beforeprint", () => {
   isPrinting = true;
-  $("#printGeneratedAt").textContent = new Intl.DateTimeFormat("ar-EG", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date());
+  $("#printGeneratedAt").textContent = window.MizanNumbers
+    ? window.MizanNumbers.formatDate(new Date(), "ar-EG", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : new Intl.DateTimeFormat("ar-EG", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date());
   renderSuppliers();
 });
 

@@ -6,6 +6,7 @@
 // ==========================================
 
 const STORAGE_KEY = "mizan_cases";
+const CLIENTS_STORAGE_KEY = "members";
 
 const seeds = [
   {
@@ -116,6 +117,7 @@ const cards = $("caseCards");
 const modal = $("caseModal");
 const overlay = $("caseOverlay");
 const form = $("caseForm");
+const clientSelect = $("clientId");
 
 const searchInput = $("searchInput");
 const statusFilter = $("statusFilter");
@@ -218,6 +220,7 @@ function normalizeCase(item, index = 0) {
 
   return {
     id: String(safeItem.id || createId()),
+    clientId: String(safeItem.clientId || ""),
     clientName: String(safeItem.clientName || ""),
     clientRole: String(safeItem.clientRole || ""),
 
@@ -300,6 +303,98 @@ function saveCases(data = cases) {
 
     return false;
   }
+}
+
+// ==========================================
+// Client Integration
+// ==========================================
+
+function getStoredClients() {
+  try {
+    const raw = localStorage.getItem(CLIENTS_STORAGE_KEY);
+
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter(
+        (item) =>
+          item &&
+          typeof item === "object" &&
+          String(item.id || "") &&
+          String(item.name || "")
+      )
+      .map((item) => ({
+        id: String(item.id),
+        name: String(item.name),
+        mobile: normalizePhone(item.mobile),
+      }));
+  } catch (error) {
+    console.error("Error loading clients:", error);
+
+    return [];
+  }
+}
+
+function populateClientSelect(selectedId = "", fallbackName = "") {
+  if (!clientSelect) return;
+
+  const clients = getStoredClients();
+
+  clientSelect.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "اختر عميلاً مسجلاً (اختياري)";
+
+  clientSelect.appendChild(placeholder);
+
+  clients.forEach((client) => {
+    const option = document.createElement("option");
+
+    option.value = client.id;
+    option.textContent = client.name;
+
+    clientSelect.appendChild(option);
+  });
+
+  const selected = String(selectedId || "");
+
+  // Keep a link to clients that were deleted or stored without a match.
+  if (
+    selected &&
+    !clients.some((client) => client.id === selected)
+  ) {
+    const missing = document.createElement("option");
+
+    missing.value = selected;
+    missing.textContent = fallbackName || "عميل غير مسجل";
+
+    clientSelect.appendChild(missing);
+  }
+
+  clientSelect.value = selected;
+}
+
+function applySelectedClient() {
+  if (!clientSelect) return;
+
+  const selected = clientSelect.selectedOptions[0];
+
+  if (!selected || !selected.value) return;
+
+  const client = getStoredClients().find(
+    (entry) => entry.id === selected.value
+  );
+
+  // Leave manually entered or legacy values untouched.
+  if (!client) return;
+
+  form.elements.clientName.value = client.name;
+  form.elements.clientPhone.value = client.mobile;
 }
 
 // ==========================================
@@ -638,6 +733,8 @@ function openModal(item = null) {
 
   form.reset();
 
+  populateClientSelect(item?.clientId, item?.clientName);
+
   $("caseModalTitle").textContent = item
     ? "تعديل القضية"
     : "إضافة قضية جديدة";
@@ -838,6 +935,9 @@ overlay.addEventListener("click", closeModal);
 // Form submit.
 form.addEventListener("submit", handleSubmit);
 
+// Auto-fill client details when a registered client is selected.
+clientSelect?.addEventListener("change", applySelectedClient);
+
 // Table and cards actions.
 table.addEventListener("click", handleAction);
 
@@ -958,6 +1058,17 @@ document.addEventListener("keydown", (event) => {
 // ==========================================
 
 window.addEventListener("storage", (event) => {
+  if (event.key === CLIENTS_STORAGE_KEY) {
+    const current = clientSelect?.selectedOptions[0];
+
+    populateClientSelect(
+      clientSelect?.value,
+      current?.value ? current.textContent : ""
+    );
+
+    return;
+  }
+
   if (event.key !== STORAGE_KEY) return;
 
   try {
@@ -987,5 +1098,7 @@ window.addEventListener("storage", (event) => {
 // ==========================================
 
 cases = loadCases();
+
+populateClientSelect();
 
 render();

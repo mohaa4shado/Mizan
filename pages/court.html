@@ -36,8 +36,10 @@
         >
           <span class="material-symbols-outlined">home</span>
         </a>
+        
       </div>
     </header>
+ 
 
     <main class="page-shell">
       <section class="page-heading">
@@ -227,6 +229,23 @@
 
       <form id="caseForm">
         <div class="form-grid">
+          <label class="form-field full-field"
+            ><span>العميل المسجل</span
+            ><select name="clientId" id="clientId">
+              <option value="">اختر عميلاً مسجلاً (اختياري)</option>
+            </select></label
+          >
+
+           <a
+            href="clients.html"
+            class="secondary-button inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-sky-500 text-white shadow-sm hover:bg-sky-600 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <span class="material-symbols-outlined text-[19px]"
+              >person_add</span
+            >
+            إضافة عميل جديد
+          </a>
+
           <label class="form-field"
             ><span>اسم العميل <b>*</b></span
             ><input
@@ -337,8 +356,7 @@
           <label class="form-field"
             ><span>اسم الخصم</span><input name="opponentName" maxlength="100"
           /></label>
-          <label class="form-field"
-            >
+          <label class="form-field">
             <span>هاتف الخصم</span>
 
             <input
@@ -346,8 +364,8 @@
               name="opponentPhone"
               id="opponentPhone"
               placeholder="أدخل رقم هاتف الخصم"
-          />
-        </label>
+            />
+          </label>
           <label class="form-field full-field"
             ><span>ملاحظات</span
             ><textarea
